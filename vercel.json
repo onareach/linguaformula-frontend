@@ -7,7 +7,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://my-physics-formula-viewer-3x-3e0ec7edbc22.herokuapp.com/api/:path*"
+      "destination": "https://linguaformula-backend-4dc5113fc0ee.herokuapp.com/api/:path*"
     }
   ],
   "headers": [
@@ -30,6 +30,6 @@
     }
   ],
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://my-physics-formula-viewer-3x-3e0ec7edbc22.herokuapp.com"
+    "NEXT_PUBLIC_API_URL": "https://linguaformula-backend-4dc5113fc0ee.herokuapp.com"
   }
 }
