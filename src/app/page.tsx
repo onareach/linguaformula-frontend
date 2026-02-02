@@ -47,11 +47,10 @@ export default function Home() {
 
   return (
     <MathJaxContext>
-      <div style={{ marginLeft: '20px', marginTop: '20px' }}>
+      <div>
         {/* Page title */}
         <h1 style={{
           marginBottom: '20px',
-          color: 'black',
           fontSize: '32px',
           fontWeight: 'bold'
         }}>
