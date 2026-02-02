@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -36,19 +37,19 @@ function Navigation() {
     <nav className="mt-12 md:mt-0 w-full md:w-1/4">
       <ul className="space-y-2 md:text-right">
         <li className="p-0">
-          <a className="text-copy" href="/">
+          <Link className="text-copy" href="/">
             about
-          </a>
+          </Link>
         </li>
         <li className="p-0">
-          <a className="text-nav hover:text-nav-hover" href="/tables">
+          <Link className="text-nav hover:text-nav-hover" href="/tables">
             tables
-          </a>
+          </Link>
         </li>
         <li className="p-0">
-          <a className="text-nav hover:text-nav-hover" href="/applications">
+          <Link className="text-nav hover:text-nav-hover" href="/applications">
             applications
-          </a>
+          </Link>
         </li>
       </ul>
     </nav>
