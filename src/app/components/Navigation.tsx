@@ -13,7 +13,7 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="mt-12 md:mt-0 w-full md:w-1/4">
+    <nav className="mt-12 md:mt-0 w-full md:w-1/4" suppressHydrationWarning>
       <div className="mb-8 text-center">
         <Image
           src="/logo.png"
@@ -26,7 +26,7 @@ export default function Navigation() {
       </div>
       <ul className="space-y-2 text-center">
         <li className="p-0">
-          <Link className="text-copy" href="/">
+          <Link className="text-copy" href="/welcome" suppressHydrationWarning>
             welcome
           </Link>
         </li>
