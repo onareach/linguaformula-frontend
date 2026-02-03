@@ -35,6 +35,11 @@ export default function Navigation() {
             formulas
           </Link>
         </li>
+        <li className="p-0">
+          <Link className="text-nav hover:text-nav-hover" href="/">
+            home
+          </Link>
+        </li>
       </ul>
     </nav>
   );

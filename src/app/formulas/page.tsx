@@ -18,7 +18,13 @@ export default function Formulas() {
   const [formulas, setFormulas] = useState<Formula[]>([]); 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true); 
-  const [hoveredFormula, setHoveredFormula] = useState<number | null>(null); 
+  const [hoveredFormula, setHoveredFormula] = useState<number | null>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false); 
+
+  useEffect(() => {
+    // Detect if device supports touch (mobile devices)
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_API_URL) {
@@ -73,8 +79,9 @@ export default function Formulas() {
                     href={`/formula/${formula.id}`} 
                     target="_blank" 
                     style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
-                    onMouseEnter={() => setHoveredFormula(formula.id)}
-                    onMouseLeave={() => setHoveredFormula(null)}
+                    onMouseEnter={() => !isTouchDevice && setHoveredFormula(formula.id)}
+                    onMouseLeave={() => !isTouchDevice && setHoveredFormula(null)}
+                    onTouchStart={() => setHoveredFormula(null)}
                   >
                     <strong>{formula.formula_name}</strong>
                   </Link>
@@ -82,8 +89,8 @@ export default function Formulas() {
                   <strong>{formula.formula_name}</strong>
                 )}
 
-                {/* Tooltip - only shown if formula_description exists */}
-                {hoveredFormula === formula.id && formula.formula_description && (
+                {/* Tooltip - only shown if formula_description exists and not on touch device */}
+                {hoveredFormula === formula.id && formula.formula_description && !isTouchDevice && (
                   <div 
                     style={{
                       position: "absolute",
