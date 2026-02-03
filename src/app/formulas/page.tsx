@@ -64,7 +64,10 @@ export default function Formulas() {
         </h1>
 
         {loading ? (
-          <p>Loading formulas...</p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+            <div className="spinner"></div>
+            <p style={{ color: '#666', fontSize: '16px', marginTop: '20px' }}>Loading formulas...</p>
+          </div>
         ) : error ? (
           <p style={{ color: 'red', fontWeight: 'bold' }}>
             Error: {error}. Please check your API connection.
