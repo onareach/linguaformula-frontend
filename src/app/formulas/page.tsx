@@ -77,7 +77,6 @@ export default function Formulas() {
                 {formula.formula_description ? (
                   <Link 
                     href={`/formula/${formula.id}`} 
-                    target="_blank" 
                     style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
                     onMouseEnter={() => !isTouchDevice && setHoveredFormula(formula.id)}
                     onMouseLeave={() => !isTouchDevice && setHoveredFormula(null)}

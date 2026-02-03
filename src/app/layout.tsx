@@ -8,6 +8,15 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "LinguaFormula",
   description: "A web application for viewing and exploring mathematical formulas with LaTeX rendering and English verbalizations",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-integral-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-integral-32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/favicon-integral-32.png',
+  },
 };
 
 export default function RootLayout({
