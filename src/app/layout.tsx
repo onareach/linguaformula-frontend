@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
+import Image from "next/image";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -35,20 +36,25 @@ export default function RootLayout({
 function Navigation() {
   return (
     <nav className="mt-12 md:mt-0 w-full md:w-1/4">
-      <ul className="space-y-2 md:text-right">
+      <div className="mb-8 text-center">
+        <Image
+          src="/logo.png"
+          alt="Lingua Formula Logo"
+          width={180}
+          height={180}
+          className="inline-block max-w-full h-auto"
+          priority
+        />
+      </div>
+      <ul className="space-y-2 text-center">
         <li className="p-0">
           <Link className="text-copy" href="/">
-            about
+            welcome
           </Link>
         </li>
         <li className="p-0">
-          <Link className="text-nav hover:text-nav-hover" href="/tables">
-            tables
-          </Link>
-        </li>
-        <li className="p-0">
-          <Link className="text-nav hover:text-nav-hover" href="/applications">
-            applications
+          <Link className="text-nav hover:text-nav-hover" href="/formulas">
+            formulas
           </Link>
         </li>
       </ul>

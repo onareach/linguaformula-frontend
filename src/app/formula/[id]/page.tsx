@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 
 interface Formula {
@@ -85,12 +86,12 @@ export default function FormulaPage() {
             </p>
           )}
         </MathJaxContext>
-      <button
-        onClick={() => window.close()} // Closes the current tab
-        style={{ textDecoration: "underline", color: "blue", cursor: "pointer", background: "none", border: "none", padding: 0, font: "inherit" }}
-        >
-          ← Back to Home
-        </button>
+      <Link
+        href="/formulas"
+        style={{ textDecoration: "underline", color: "blue", cursor: "pointer" }}
+      >
+        ← Back to Formula List
+      </Link>
     </div>
   );
 }
