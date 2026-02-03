@@ -34,6 +34,40 @@ export default function Formulas() {
       return;
     }
 
+    // Check for cached data in sessionStorage
+    const cacheKey = 'linguaformula_formulas_cache';
+    const cachedData = sessionStorage.getItem(cacheKey);
+    
+    if (cachedData) {
+      try {
+        const parsedData = JSON.parse(cachedData);
+        setFormulas(parsedData);
+        setLoading(false);
+        // Still fetch in background to update cache, but don't show loading
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/formulas`)
+          .then((res) => {
+            if (res.ok) {
+              return res.json();
+            }
+            return null;
+          })
+          .then((data) => {
+            if (data) {
+              sessionStorage.setItem(cacheKey, JSON.stringify(data));
+              setFormulas(data);
+            }
+          })
+          .catch(() => {
+            // Silently fail background update
+          });
+        return;
+      } catch (e) {
+        // If cache is corrupted, clear it and fetch fresh data
+        sessionStorage.removeItem(cacheKey);
+      }
+    }
+
+    // No cache found, fetch from API
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/formulas`)
       .then((res) => {
         if (!res.ok) {
@@ -43,6 +77,8 @@ export default function Formulas() {
       })
       .then((data) => {
         setFormulas(data);
+        // Cache the data in sessionStorage
+        sessionStorage.setItem(cacheKey, JSON.stringify(data));
         setLoading(false);
       })
       .catch((err) => {
