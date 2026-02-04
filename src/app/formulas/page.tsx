@@ -37,7 +37,7 @@ function FormulasContent() {
   const [hoveredFormula, setHoveredFormula] = useState<number | null>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
-  const [isRendering, setIsRendering] = useState(false);
+  const [isRendering, setIsRendering] = useState(true); // Start as true to prevent initial render
   const formulasRef = useRef<Formula[]>([]);
   
   // Initialize filter state from URL params
@@ -462,7 +462,7 @@ function FormulasContent() {
                 {/* MathJax formula display - only render when stable */}
                 {formula.latex && !loading && !isRendering && formulasRef.current.length > 0 ? (
                   <div key={`formula-wrapper-${formula.id}-${renderKey}`}>
-                    <MathJax>
+                    <MathJax key={`formula-${formula.id}-${renderKey}`}>
                       <span style={{ whiteSpace: 'normal', display: 'inline-block', maxWidth: '80%' }}>
                         {`\\(${formula.latex}\\)`}
                       </span>

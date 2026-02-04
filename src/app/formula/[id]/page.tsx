@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
@@ -8,8 +8,8 @@ import { MathJax, MathJaxContext } from "better-react-mathjax";
 interface Formula {
   id: number;
   formula_name: string;
-  latex: string;
-  formula_description: string;
+  latex?: string | null;
+  formula_description?: string | null;
   english_verbalization?: string;
   symbolic_verbalization?: string;
   units?: string;
@@ -23,6 +23,8 @@ function FormulaPageContent() {
   const [formula, setFormula] = useState<Formula | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [renderKey, setRenderKey] = useState(0);
+  const [isRendering, setIsRendering] = useState(false);
   
   // Build back link with preserved filter parameters
   const getBackLink = () => {
@@ -68,6 +70,12 @@ function FormulaPageContent() {
       .then((data) => {
         setFormula(data);
         setLoading(false);
+        // Delay MathJax rendering to ensure DOM is stable
+        setIsRendering(true);
+        setTimeout(() => {
+          setIsRendering(false);
+          setRenderKey(prev => prev + 1);
+        }, 150);
       })
       .catch((err) => {
         console.error("Fetch error:", err);
@@ -81,6 +89,18 @@ function FormulaPageContent() {
 
   return (
     <div style={{ padding: "20px" }}>
+      <Link
+        href={getBackLink()}
+        style={{ 
+          textDecoration: "underline", 
+          color: "blue", 
+          cursor: "pointer",
+          display: "inline-block",
+          marginBottom: "16px"
+        }}
+      >
+        ← Back to Formula List
+      </Link>
       <h1 style={{
           marginBottom: '20px',
           color: 'black',
@@ -90,12 +110,16 @@ function FormulaPageContent() {
           {formula?.formula_name}
         </h1>
         <MathJaxContext>
-          <MathJax>    
-            <p style={{ marginBottom: "24px" }}><strong>Full Description:</strong> {formula?.formula_description}</p>
-          </MathJax>
-          <MathJax>
-            <p style={{ fontSize: "24px", marginBottom: "20px" }}>{`\\(${formula?.latex}\\)`}</p>
-          </MathJax>
+          {formula?.formula_description && !isRendering && (
+            <MathJax key={`description-${renderKey}`}>    
+              <p style={{ marginBottom: "24px" }}><strong>Full Description:</strong> {formula.formula_description}</p>
+            </MathJax>
+          )}
+          {formula?.latex && !isRendering && (
+            <MathJax key={`formula-${renderKey}`}>
+              <p style={{ fontSize: "24px", marginBottom: "20px" }}>{`\\(${formula.latex}\\)`}</p>
+            </MathJax>
+          )}
           {formula?.english_verbalization && (
             <div style={{ marginTop: "24px", marginBottom: "24px" }}>
               <p style={{ 
