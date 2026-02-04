@@ -10,10 +10,6 @@ interface Formula {
   formula_name: string;
   latex: string;
   formula_description?: string | null;
-  category?: string | null;
-  difficulty_level?: string | null;
-  assumptions?: string | null;
-  output_target?: string | null;
   variables?: Variable[];
   keywords?: Keyword[];
   examples?: Example[];
@@ -68,8 +64,6 @@ interface MatchResult {
 
 export default function AdvancedSearch() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [category, setCategory] = useState('');
-  const [difficulty, setDifficulty] = useState('');
   const [problemText, setProblemText] = useState('');
   const [searchResults, setSearchResults] = useState<Formula[]>([]);
   const [problemMatches, setProblemMatches] = useState<ProblemMatch[]>([]);
@@ -86,8 +80,6 @@ export default function AdvancedSearch() {
     try {
       const params = new URLSearchParams();
       if (searchQuery) params.append('q', searchQuery);
-      if (category) params.append('category', category);
-      if (difficulty) params.append('difficulty', difficulty);
 
       const response = await fetch(`${apiUrl}/api/formulas/search?${params}`);
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -129,15 +121,6 @@ export default function AdvancedSearch() {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getDifficultyColor = (level: string | null | undefined) => {
-    switch (level?.toLowerCase()) {
-      case 'beginner': return '#28a745';
-      case 'intermediate': return '#ffc107';
-      case 'advanced': return '#dc3545';
-      default: return '#6c757d';
     }
   };
 
@@ -217,7 +200,7 @@ export default function AdvancedSearch() {
             marginBottom: '20px' 
           }}>
             <h3>Formula Search</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                   Search Query:
@@ -234,48 +217,6 @@ export default function AdvancedSearch() {
                     borderRadius: '4px'
                   }}
                 />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                  Category:
-                </label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
-                >
-                  <option value="">All Categories</option>
-                  <option value="Probability">Probability</option>
-                  <option value="Mechanics">Mechanics</option>
-                  <option value="Thermodynamics">Thermodynamics</option>
-                  <option value="Electromagnetism">Electromagnetism</option>
-                  <option value="Quantum">Quantum</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                  Difficulty:
-                </label>
-                <select
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
-                >
-                  <option value="">All Levels</option>
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
               </div>
             </div>
             <button
@@ -369,29 +310,7 @@ export default function AdvancedSearch() {
                         <p style={{ margin: '10px 0', color: '#666' }}>{formula.formula_description}</p>
                       )}
                     </div>
-                    <div style={{ marginLeft: '15px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                      {formula.category && (
-                        <span style={{ 
-                          backgroundColor: '#e9ecef', 
-                          padding: '2px 8px', 
-                          borderRadius: '4px',
-                          fontSize: '12px'
-                        }}>
-                          {formula.category}
-                        </span>
-                      )}
-                      {formula.difficulty_level && (
-                        <span style={{ 
-                          backgroundColor: getDifficultyColor(formula.difficulty_level),
-                          color: 'white',
-                          padding: '2px 8px', 
-                          borderRadius: '4px',
-                          fontSize: '12px'
-                        }}>
-                          {formula.difficulty_level}
-                        </span>
-                      )}
-                    </div>
+                    {/* category/difficulty_level removed from schema */}
                   </div>
                   
                   {formula.keywords && formula.keywords.length > 0 && (
@@ -447,29 +366,7 @@ export default function AdvancedSearch() {
                         <p style={{ margin: '10px 0', color: '#666' }}>{match.formula.formula_description}</p>
                       )}
                     </div>
-                    <div style={{ marginLeft: '15px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                      {match.formula.category && (
-                        <span style={{ 
-                          backgroundColor: '#e9ecef', 
-                          padding: '2px 8px', 
-                          borderRadius: '4px',
-                          fontSize: '12px'
-                        }}>
-                          {match.formula.category}
-                        </span>
-                      )}
-                      {match.formula.difficulty_level && (
-                        <span style={{ 
-                          backgroundColor: getDifficultyColor(match.formula.difficulty_level),
-                          color: 'white',
-                          padding: '2px 8px', 
-                          borderRadius: '4px',
-                          fontSize: '12px'
-                        }}>
-                          {match.formula.difficulty_level}
-                        </span>
-                      )}
-                    </div>
+                    {/* category/difficulty_level removed from schema */}
                   </div>
                   
                   <div style={{ marginTop: '10px' }}>

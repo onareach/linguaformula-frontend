@@ -10,10 +10,6 @@ interface Formula {
   formula_name: string;
   latex: string;
   formula_description?: string | null;
-  category?: string | null;
-  difficulty_level?: string | null;
-  assumptions?: string | null;
-  output_target?: string | null;
   variables?: Variable[];
   keywords?: Keyword[];
   examples?: Example[];
@@ -137,8 +133,6 @@ export default function Tables() {
                 <tr>
                   <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>ID</th>
                   <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Name</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Category</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Difficulty</th>
                   <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Actions</th>
                 </tr>
               </thead>
@@ -148,31 +142,6 @@ export default function Tables() {
                     <td style={{ padding: '12px' }}>{formula.id}</td>
                     <td style={{ padding: '12px' }}>
                       <strong>{formula.formula_name}</strong>
-                    </td>
-                    <td style={{ padding: '12px' }}>
-                      {formula.category && (
-                        <span style={{ 
-                          backgroundColor: '#e9ecef', 
-                          padding: '2px 8px', 
-                          borderRadius: '4px',
-                          fontSize: '12px'
-                        }}>
-                          {formula.category}
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '12px' }}>
-                      {formula.difficulty_level && (
-                        <span style={{ 
-                          backgroundColor: getDifficultyColor(formula.difficulty_level),
-                          color: 'white',
-                          padding: '2px 8px', 
-                          borderRadius: '4px',
-                          fontSize: '12px'
-                        }}>
-                          {formula.difficulty_level}
-                        </span>
-                      )}
                     </td>
                     <td style={{ padding: '12px' }}>
                       <button
