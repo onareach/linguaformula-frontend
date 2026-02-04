@@ -6,7 +6,7 @@ import LayoutWrapper from "./components/LayoutWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LinguaFormula",
+  title: "Lingua Formula",
   description: "A web application for viewing and exploring mathematical formulas with LaTeX rendering and English verbalizations",
   icons: {
     icon: [
