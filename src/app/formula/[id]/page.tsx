@@ -11,6 +11,10 @@ interface Formula {
   latex: string;
   formula_description: string;
   english_verbalization?: string;
+  symbolic_verbalization?: string;
+  units?: string;
+  example?: string;
+  historical_context?: string;
 }
 
 function FormulaPageContent() {
@@ -93,15 +97,90 @@ function FormulaPageContent() {
             <p style={{ fontSize: "24px", marginBottom: "20px" }}>{`\\(${formula?.latex}\\)`}</p>
           </MathJax>
           {formula?.english_verbalization && (
-            <p style={{ 
-              marginTop: "16px", 
-              marginBottom: "24px", 
-              fontStyle: "italic",
-              color: "#555",
-              fontSize: "18px"
-            }}>
-              <strong>In words:</strong> {formula.english_verbalization}
-            </p>
+            <div style={{ marginTop: "24px", marginBottom: "24px" }}>
+              <p style={{ 
+                marginBottom: "8px",
+                fontWeight: "bold",
+                fontSize: "18px"
+              }}>
+                In words:
+              </p>
+              <p style={{ 
+                fontStyle: "italic",
+                color: "#555",
+                fontSize: "16px"
+              }}>
+                {formula.english_verbalization}
+              </p>
+            </div>
+          )}
+          {formula?.symbolic_verbalization && (
+            <div style={{ marginTop: "24px", marginBottom: "24px" }}>
+              <p style={{ 
+                marginBottom: "8px",
+                fontWeight: "bold",
+                fontSize: "18px"
+              }}>
+                Pronunciation:
+              </p>
+              <p style={{ 
+                color: "#555",
+                fontSize: "16px"
+              }}>
+                {formula.symbolic_verbalization}
+              </p>
+            </div>
+          )}
+          {formula?.units && (
+            <div style={{ marginTop: "24px", marginBottom: "24px" }}>
+              <p style={{ 
+                marginBottom: "8px",
+                fontWeight: "bold",
+                fontSize: "18px"
+              }}>
+                Units:
+              </p>
+              <p style={{ 
+                color: "#555",
+                fontSize: "16px"
+              }}>
+                {formula.units}
+              </p>
+            </div>
+          )}
+          {formula?.example && (
+            <div style={{ marginTop: "24px", marginBottom: "24px" }}>
+              <p style={{ 
+                marginBottom: "8px",
+                fontWeight: "bold",
+                fontSize: "18px"
+              }}>
+                Example:
+              </p>
+              <p style={{ 
+                color: "#555",
+                fontSize: "16px"
+              }}>
+                {formula.example}
+              </p>
+            </div>
+          )}
+          {formula?.historical_context && (
+            <div style={{ marginTop: "24px", marginBottom: "24px" }}>
+              <p style={{ 
+                marginBottom: "8px",
+                fontWeight: "bold",
+                fontSize: "18px"
+              }}>
+                Historical Context:
+              </p>
+              <p style={{ 
+                color: "#555",
+                fontSize: "16px"
+              }}>
+                {formula.historical_context}
+              </p>
+            </div>
           )}
         </MathJaxContext>
       <Link
