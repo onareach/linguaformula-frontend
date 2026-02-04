@@ -3,14 +3,15 @@
 'use client'; 
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';  
+import { useEffect, useState, Suspense, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { MathJax, MathJaxContext } from 'better-react-mathjax'; 
 
 // TypeScript interfaces
 interface Formula {
   id: number;
   formula_name: string;
-  latex: string;
+  latex?: string | null;
   formula_description?: string | null;
 }
 
@@ -25,7 +26,9 @@ interface Discipline {
   formula_count: number;
 }
 
-export default function Formulas() {
+function FormulasContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [formulas, setFormulas] = useState<Formula[]>([]); 
   const [disciplines, setDisciplines] = useState<Discipline[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -33,9 +36,28 @@ export default function Formulas() {
   const [loadingFilters, setLoadingFilters] = useState(true);
   const [hoveredFormula, setHoveredFormula] = useState<number | null>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [selectedDisciplines, setSelectedDisciplines] = useState<Set<number>>(new Set());
+  const [renderKey, setRenderKey] = useState(0);
+  const [isRendering, setIsRendering] = useState(false);
+  const formulasRef = useRef<Formula[]>([]);
+  
+  // Initialize filter state from URL params
+  const getInitialDisciplines = (): Set<number> => {
+    const disciplineIds = searchParams.get('disciplines');
+    if (disciplineIds) {
+      return new Set(disciplineIds.split(',').map(id => parseInt(id, 10)).filter(id => !isNaN(id)));
+    }
+    return new Set();
+  };
+  
+  const getInitialIncludeChildren = (): boolean => {
+    const include = searchParams.get('include_children');
+    return include !== 'false'; // Default to true
+  };
+  
+  const [selectedDisciplines, setSelectedDisciplines] = useState<Set<number>>(getInitialDisciplines());
   const [expandedParents, setExpandedParents] = useState<Set<number>>(new Set());
-  const [includeChildren, setIncludeChildren] = useState(true);
+  const [includeChildren, setIncludeChildren] = useState(getInitialIncludeChildren());
+  const [isInitialMount, setIsInitialMount] = useState(true);
 
   useEffect(() => {
     // Detect if device supports touch (mobile devices)
@@ -45,7 +67,13 @@ export default function Formulas() {
   // Fetch disciplines
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_API_URL) {
+      setError("API URL is not configured. Please check your environment variables.");
       setLoadingFilters(false);
+      return;
+    }
+
+    // Only fetch if we don't already have disciplines
+    if (disciplines.length > 0) {
       return;
     }
 
@@ -59,12 +87,35 @@ export default function Formulas() {
       .then((data) => {
         setDisciplines(data);
         setLoadingFilters(false);
+        
+        // Expand parent disciplines if any of their children are selected from URL params
+        const disciplineIds = searchParams.get('disciplines');
+        if (disciplineIds) {
+          const selectedIds = disciplineIds.split(',').map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+          const parentsToExpand = new Set<number>();
+          data.forEach((disc: Discipline) => {
+            if (disc.parent_id && selectedIds.includes(disc.id)) {
+              parentsToExpand.add(disc.parent_id);
+            }
+          });
+          if (parentsToExpand.size > 0) {
+            setExpandedParents(prev => {
+              const newSet = new Set(prev);
+              parentsToExpand.forEach(id => newSet.add(id));
+              return newSet;
+            });
+          }
+        }
       })
       .catch((err) => {
         console.error('Error fetching disciplines:', err);
+        const errorMessage = err.message === 'Failed to fetch' 
+          ? 'Unable to connect to the API. Please ensure the backend server is running at ' + process.env.NEXT_PUBLIC_API_URL
+          : `Error fetching disciplines: ${err.message}`;
+        setError(errorMessage);
         setLoadingFilters(false);
       });
-  }, []);
+  }, [searchParams, disciplines.length]);
 
   // Fetch formulas (with optional filtering)
   useEffect(() => {
@@ -93,14 +144,50 @@ export default function Formulas() {
         return res.json();
       })
       .then((data) => {
+        formulasRef.current = data;
         setFormulas(data);
         setLoading(false);
+        // Delay MathJax rendering to ensure DOM is stable
+        setIsRendering(true);
+        setTimeout(() => {
+          setIsRendering(false);
+          setRenderKey(prev => prev + 1);
+        }, 150);
       })
       .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
   }, [selectedDisciplines, includeChildren]);
+
+  // Mark initial mount as complete after first render
+  useEffect(() => {
+    setIsInitialMount(false);
+  }, []);
+
+  // Update URL when filters change (using useEffect to avoid render-time updates)
+  // Skip URL update on initial mount to prevent re-render issues
+  useEffect(() => {
+    if (isInitialMount) {
+      return;
+    }
+    
+    const params = new URLSearchParams();
+    if (selectedDisciplines.size > 0) {
+      params.set('disciplines', Array.from(selectedDisciplines).join(','));
+    }
+    if (!includeChildren) {
+      params.set('include_children', 'false');
+    }
+    const newUrl = params.toString() ? `/formulas?${params.toString()}` : '/formulas';
+    const currentUrl = window.location.pathname + window.location.search;
+    if (newUrl !== currentUrl) {
+      // Use setTimeout to defer URL update until after render completes
+      setTimeout(() => {
+        router.replace(newUrl, { scroll: false });
+      }, 0);
+    }
+  }, [selectedDisciplines, includeChildren, router, isInitialMount]);
 
   const toggleDiscipline = (disciplineId: number) => {
     setSelectedDisciplines(prev => {
@@ -226,7 +313,9 @@ export default function Formulas() {
                 <input
                   type="checkbox"
                   checked={includeChildren}
-                  onChange={(e) => setIncludeChildren(e.target.checked)}
+                  onChange={(e) => {
+                    setIncludeChildren(e.target.checked);
+                  }}
                 />
                 <span style={{ fontSize: '14px' }}>Include child disciplines when selecting a parent</span>
               </label>
@@ -326,7 +415,17 @@ export default function Formulas() {
                 {/* Conditionally render as hyperlink only if formula_description exists */}
                 {formula.formula_description ? (
                   <Link 
-                    href={`/formula/${formula.id}`} 
+                    href={(() => {
+                      const params = new URLSearchParams();
+                      if (selectedDisciplines.size > 0) {
+                        params.set('disciplines', Array.from(selectedDisciplines).join(','));
+                      }
+                      if (!includeChildren) {
+                        params.set('include_children', 'false');
+                      }
+                      const queryString = params.toString();
+                      return `/formula/${formula.id}${queryString ? `?${queryString}` : ''}`;
+                    })()}
                     style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
                     onMouseEnter={() => !isTouchDevice && setHoveredFormula(formula.id)}
                     onMouseLeave={() => !isTouchDevice && setHoveredFormula(null)}
@@ -354,21 +453,44 @@ export default function Formulas() {
                       zIndex: 10
                     }}
                   >
-                    <MathJax>{formula.formula_description}</MathJax>
+                    {formula.formula_description && (
+                      <MathJax key={`tooltip-${formula.id}-${renderKey}`}>{formula.formula_description}</MathJax>
+                    )}
                   </div>
                 )}
 
-                {/* MathJax formula display */}
-                <MathJax>
-                  <span style={{ whiteSpace: 'normal', display: 'inline-block', maxWidth: '80%' }}>
-                    {`\\(${formula.latex}\\)`}
-                  </span>
-                </MathJax>
+                {/* MathJax formula display - only render when stable */}
+                {formula.latex && !loading && !isRendering && formulasRef.current.length > 0 ? (
+                  <div key={`formula-wrapper-${formula.id}-${renderKey}`}>
+                    <MathJax>
+                      <span style={{ whiteSpace: 'normal', display: 'inline-block', maxWidth: '80%' }}>
+                        {`\\(${formula.latex}\\)`}
+                      </span>
+                    </MathJax>
+                  </div>
+                ) : formula.latex ? (
+                  <span style={{ color: '#6b7280', fontStyle: 'italic' }}>Loading formula...</span>
+                ) : (
+                  <span style={{ color: '#6b7280', fontStyle: 'italic' }}>No formula available</span>
+                )}
               </li>
             ))}
           </ul>
         )}
       </div>
     </MathJaxContext>
+  );
+}
+
+export default function Formulas() {
+  return (
+    <Suspense fallback={
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+        <div className="spinner"></div>
+        <p style={{ color: '#666', fontSize: '16px', marginTop: '20px' }}>Loading...</p>
+      </div>
+    }>
+      <FormulasContent />
+    </Suspense>
   );
 }

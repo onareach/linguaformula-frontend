@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 
@@ -13,11 +13,29 @@ interface Formula {
   english_verbalization?: string;
 }
 
-export default function FormulaPage() {
+function FormulaPageContent() {
   const { id } = useParams(); // Get formula ID from URL
+  const searchParams = useSearchParams();
   const [formula, setFormula] = useState<Formula | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Build back link with preserved filter parameters
+  const getBackLink = () => {
+    const params = new URLSearchParams();
+    const disciplines = searchParams.get('disciplines');
+    const includeChildren = searchParams.get('include_children');
+    
+    if (disciplines) {
+      params.set('disciplines', disciplines);
+    }
+    if (includeChildren === 'false') {
+      params.set('include_children', 'false');
+    }
+    
+    const queryString = params.toString();
+    return `/formulas${queryString ? `?${queryString}` : ''}`;
+  };
 
   useEffect(() => {
     // Check if ID is correctly retrieved
@@ -87,11 +105,19 @@ export default function FormulaPage() {
           )}
         </MathJaxContext>
       <Link
-        href="/formulas"
+        href={getBackLink()}
         style={{ textDecoration: "underline", color: "blue", cursor: "pointer" }}
       >
         ← Back to Formula List
       </Link>
     </div>
+  );
+}
+
+export default function FormulaPage() {
+  return (
+    <Suspense fallback={<p>Loading formula...</p>}>
+      <FormulaPageContent />
+    </Suspense>
   );
 }
