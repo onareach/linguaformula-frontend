@@ -27,6 +27,13 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Accessibility: visible focus for keyboard users only (no change for mouse) */
+*:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 h1,
 h2,
 h3,
