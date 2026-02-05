@@ -168,7 +168,25 @@ function FormulaPageContent() {
                 color: "#555",
                 fontSize: "16px"
               }}>
-                {formula.units}
+                {(() => {
+                  const u = formula.units;
+                  const siIndex = u.search(/\bSI\b/);
+                  if (siIndex === -1) return u;
+                  return (
+                    <>
+                      {u.slice(0, siIndex)}
+                      <Link
+                        href="/si"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: "#2563eb", textDecoration: "underline" }}
+                      >
+                        SI
+                      </Link>
+                      {u.slice(siIndex + 2)}
+                    </>
+                  );
+                })()}
               </p>
             </div>
           )}

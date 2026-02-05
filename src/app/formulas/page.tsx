@@ -3,9 +3,32 @@
 'use client'; 
 
 import Link from 'next/link';
-import { useEffect, useState, Suspense, useRef } from 'react';
+import React, { useEffect, useState, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { MathJax, MathJaxContext } from 'better-react-mathjax'; 
+
+// Error boundary so one formula's MathJax failure (e.g. dev Strict Mode) doesn't crash the list
+class FormulaDisplayErrorBoundary extends React.Component<{
+  formula: Formula;
+  children: React.ReactNode;
+}> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(): { hasError: true } {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <span style={{ whiteSpace: 'normal', display: 'inline-block', maxWidth: '80%', fontSize: '0.9em' }}>
+          <code style={{ background: '#f3f4f6', padding: '2px 6px', borderRadius: 4 }}>{this.props.formula.latex ?? ''}</code>
+        </span>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // TypeScript interfaces
 interface Formula {
@@ -39,6 +62,8 @@ function FormulasContent() {
   const [renderKey, setRenderKey] = useState(0);
   const [isRendering, setIsRendering] = useState(true); // Start as true to prevent initial render
   const formulasRef = useRef<Formula[]>([]);
+  const typesetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelledRef = useRef(false);
   
   // Initialize filter state from URL params
   const getInitialDisciplines = (): Set<number> => {
@@ -119,6 +144,7 @@ function FormulasContent() {
 
   // Fetch formulas (with optional filtering)
   useEffect(() => {
+    cancelledRef.current = false;
     if (!process.env.NEXT_PUBLIC_API_URL) {
       setError("API URL is not set.");
       setLoading(false);
@@ -144,20 +170,41 @@ function FormulasContent() {
         return res.json();
       })
       .then((data) => {
+        if (cancelledRef.current) return;
         formulasRef.current = data;
         setFormulas(data);
         setLoading(false);
-        // Delay MathJax rendering to ensure DOM is stable
         setIsRendering(true);
-        setTimeout(() => {
-          setIsRendering(false);
-          setRenderKey(prev => prev + 1);
-        }, 150);
+        // Clear any previous timeout (e.g. from Strict Mode remount)
+        if (typesetTimeoutRef.current) {
+          clearTimeout(typesetTimeoutRef.current);
+          typesetTimeoutRef.current = null;
+        }
+        // Delay MathJax until DOM is stable; use rAF so we're past any unmount (e.g. Strict Mode)
+        typesetTimeoutRef.current = setTimeout(() => {
+          typesetTimeoutRef.current = null;
+          if (cancelledRef.current) return;
+          requestAnimationFrame(() => {
+            if (cancelledRef.current) return;
+            setIsRendering(false);
+            setRenderKey(prev => prev + 1);
+          });
+        }, 200);
       })
       .catch((err) => {
-        setError(err.message);
-        setLoading(false);
+        if (!cancelledRef.current) {
+          setError(err.message);
+          setLoading(false);
+        }
       });
+
+    return () => {
+      cancelledRef.current = true;
+      if (typesetTimeoutRef.current) {
+        clearTimeout(typesetTimeoutRef.current);
+        typesetTimeoutRef.current = null;
+      }
+    };
   }, [selectedDisciplines, includeChildren]);
 
   // Mark initial mount as complete after first render
@@ -459,15 +506,17 @@ function FormulasContent() {
                   </div>
                 )}
 
-                {/* MathJax formula display - only render when stable */}
+                {/* MathJax formula display - only render when stable; boundary avoids crash if typeset fails (e.g. dev Strict Mode) */}
                 {formula.latex && !loading && !isRendering && formulasRef.current.length > 0 ? (
-                  <div key={`formula-wrapper-${formula.id}-${renderKey}`}>
-                    <MathJax key={`formula-${formula.id}-${renderKey}`}>
-                      <span style={{ whiteSpace: 'normal', display: 'inline-block', maxWidth: '80%' }}>
-                        {`\\(${formula.latex}\\)`}
-                      </span>
-                    </MathJax>
-                  </div>
+                  <FormulaDisplayErrorBoundary formula={formula}>
+                    <div key={`formula-wrapper-${formula.id}-${renderKey}`}>
+                      <MathJax key={`formula-${formula.id}-${renderKey}`}>
+                        <span style={{ whiteSpace: 'normal', display: 'inline-block', maxWidth: '80%' }}>
+                          {`\\(${formula.latex}\\)`}
+                        </span>
+                      </MathJax>
+                    </div>
+                  </FormulaDisplayErrorBoundary>
                 ) : formula.latex ? (
                   <span style={{ color: '#6b7280', fontStyle: 'italic' }}>Loading formula...</span>
                 ) : (
