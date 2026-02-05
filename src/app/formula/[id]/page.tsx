@@ -109,6 +109,16 @@ function FormulaPageContent() {
         }}>
           {formula?.formula_name}
         </h1>
+      <p style={{ marginBottom: '16px' }}>
+        <a
+          href={`/formula/${id}/quiz`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#2563eb', textDecoration: 'underline', fontWeight: 500 }}
+        >
+          Quiz Me!
+        </a>
+      </p>
         <MathJaxContext>
           {formula?.formula_description && !isRendering && (
             <MathJax key={`description-${renderKey}`}>    
