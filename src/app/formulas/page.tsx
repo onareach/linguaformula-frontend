@@ -83,6 +83,15 @@ function FormulasContent() {
   const [expandedParents, setExpandedParents] = useState<Set<number>>(new Set());
   const [includeChildren, setIncludeChildren] = useState(getInitialIncludeChildren());
   const [isInitialMount, setIsInitialMount] = useState(true);
+  const [keyboardHintVisible, setKeyboardHintVisible] = useState(false);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') setKeyboardHintVisible(true);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   useEffect(() => {
     // Detect if device supports touch (mobile devices)
@@ -293,9 +302,10 @@ function FormulasContent() {
             borderRadius: '8px',
             backgroundColor: '#f9fafb'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Filter by Discipline</h2>
-              {selectedDisciplines.size > 0 && (
+            <div style={{ marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Filter by Discipline</h2>
+                {selectedDisciplines.size > 0 && (
                 <button
                   onClick={clearFilters}
                   style={{
@@ -311,6 +321,8 @@ function FormulasContent() {
                   Clear All
                 </button>
               )}
+              </div>
+              <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0', display: keyboardHintVisible ? 'block' : 'none' }}>Keyboard: Tab to focus; Enter on +/− to expand or collapse; Space to check or uncheck.</p>
             </div>
 
             {/* Active Filters */}
@@ -380,7 +392,16 @@ function FormulasContent() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       {children.length > 0 && (
                         <button
+                          type="button"
                           onClick={() => toggleParentExpansion(parent.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              toggleParentExpansion(parent.id);
+                            }
+                          }}
+                          aria-expanded={isExpanded}
+                          aria-label={isExpanded ? `Collapse ${parent.name}` : `Expand ${parent.name}`}
                           style={{
                             background: 'none',
                             border: 'none',
