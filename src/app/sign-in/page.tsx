@@ -82,7 +82,7 @@ function SignInContent() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          autoComplete="current-password"
+          autoComplete="off"
         />
         <button
           type="submit"
