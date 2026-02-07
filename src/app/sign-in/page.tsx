@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -11,7 +11,7 @@ function safeFrom(from: string | null): string {
   return from;
 }
 
-export default function SignInPage() {
+function SignInContent() {
   const searchParams = useSearchParams();
   const from = safeFrom(searchParams.get('from'));
   const [email, setEmail] = useState('');
@@ -96,5 +96,13 @@ export default function SignInPage() {
         Don&apos;t have an account? <Link href={`/register?from=${encodeURIComponent(from)}`} className="text-blue-600 hover:underline">Register</Link>
       </p>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="max-w-md mx-auto">Loading…</div>}>
+      <SignInContent />
+    </Suspense>
   );
 }
