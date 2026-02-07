@@ -165,3 +165,22 @@ h4 {
     background: rgb(161 161 170); /* zinc-400 */
   }
 }
+
+/* Formulas page filter – olive theme */
+.formulas-filter input[type="checkbox"] {
+  accent-color: #6b7c3d;
+}
+
+.formulas-filter-clear {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #6b7c3d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.formulas-filter-clear:hover {
+  background-color: #7a8f4a;
+}

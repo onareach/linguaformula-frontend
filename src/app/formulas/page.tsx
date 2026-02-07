@@ -295,28 +295,24 @@ function FormulasContent() {
 
         {/* Discipline Filter Section */}
         {!loadingFilters && disciplines.length > 0 && (
-          <div style={{
-            marginBottom: '30px',
-            padding: '15px',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-            backgroundColor: '#f9fafb'
-          }}>
+          <div
+            className="formulas-filter"
+            style={{
+              marginBottom: '30px',
+              padding: '15px',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              backgroundColor: '#f9fafb'
+            }}
+          >
             <div style={{ marginBottom: '15px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                 <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Filter by Discipline</h2>
                 {selectedDisciplines.size > 0 && (
                 <button
+                  type="button"
                   onClick={clearFilters}
-                  style={{
-                    padding: '6px 12px',
-                    fontSize: '14px',
-                    backgroundColor: '#ef4444',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
+                  className="formulas-filter-clear"
                 >
                   Clear All
                 </button>
@@ -336,7 +332,7 @@ function FormulasContent() {
                       key={id}
                       style={{
                         padding: '4px 12px',
-                        backgroundColor: '#3b82f6',
+                        backgroundColor: '#6b7c3d',
                         color: 'white',
                         borderRadius: '16px',
                         fontSize: '14px',
@@ -482,7 +478,7 @@ function FormulasContent() {
           <ul>
             {formulas.map((formula) => (
               <li key={formula.id} style={{ marginBottom: '15px', position: 'relative' }}>
-                {/* Conditionally render as hyperlink only if formula_description exists */}
+                {/* Conditionally render as hyperlink only if formula_description exists. Revert link color to color: 'blue' if desired. */}
                 {formula.formula_description ? (
                   <Link 
                     href={(() => {
@@ -496,7 +492,7 @@ function FormulasContent() {
                       const queryString = params.toString();
                       return `/formula/${formula.id}${queryString ? `?${queryString}` : ''}`;
                     })()}
-                    style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
+                    style={{ textDecoration: 'underline', color: '#556b2f', cursor: 'pointer' }}
                     onMouseEnter={() => !isTouchDevice && setHoveredFormula(formula.id)}
                     onMouseLeave={() => !isTouchDevice && setHoveredFormula(null)}
                     onTouchStart={() => setHoveredFormula(null)}
