@@ -3,18 +3,16 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Navigation() {
   const pathname = usePathname();
-  
-  // Hide navigation on the landing page
-  if (pathname === '/') {
-    return null;
-  }
+  const { user } = useAuth();
+  if (pathname === '/') return null;
 
   return (
-    <nav className="mt-12 md:mt-0 w-full md:w-1/4" suppressHydrationWarning>
-      <div className="mb-8 text-center">
+    <nav className="mt-12 md:mt-0 w-full md:w-1/4 md:order-2" suppressHydrationWarning>
+      <div className="mb-4 text-center">
         <Image
           src="/logo.png"
           alt="Lingua Formula Logo"
@@ -39,6 +37,17 @@ export default function Navigation() {
           <Link className="text-nav hover:text-nav-hover" href="/">
             home
           </Link>
+        </li>
+        <li className="p-0">
+          {user ? (
+            <Link className="text-nav hover:text-nav-hover" href="/account">
+              account
+            </Link>
+          ) : (
+            <Link className="text-nav hover:text-nav-hover" href="/sign-in">
+              sign in
+            </Link>
+          )}
         </li>
       </ul>
     </nav>

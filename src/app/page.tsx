@@ -1,16 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
+import HomeNav from "./components/HomeNav";
 
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">
-      <div className="mb-6">
+      <div className="mb-[5px] block">
         <Image
           src="/logo.png"
           alt="Lingua Formula Logo"
           width={360}
           height={360}
-          className="inline-block max-w-full h-auto"
+          className="block max-w-full h-auto"
           priority
         />
       </div>
@@ -21,6 +22,7 @@ export default function Home() {
         <Link className="text-nav hover:text-nav-hover text-lg" href="/formulas">
           formulas
         </Link>
+        <HomeNav />
       </nav>
     </div>
   );
