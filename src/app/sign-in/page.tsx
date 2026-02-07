@@ -15,10 +15,10 @@ export default function SignInPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (user) router.replace('/');
-  }, [user, router]);
+    if (user && !error) router.replace('/');
+  }, [user, error, router]);
 
-  if (user) return null;
+  if (user && !error) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
