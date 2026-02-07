@@ -465,7 +465,9 @@ function FormulasContent() {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="spinner" aria-hidden />
+            <div className="bouncing-dots" aria-hidden>
+              <span /><span /><span />
+            </div>
             <p className="mt-4 text-sm text-gray-500 dark:text-zinc-400">Loading formulas…</p>
           </div>
         ) : error ? (
@@ -556,7 +558,9 @@ export default function Formulas() {
   return (
     <Suspense fallback={
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="spinner" aria-hidden />
+        <div className="bouncing-dots" aria-hidden>
+          <span /><span /><span />
+        </div>
         <p className="mt-4 text-sm text-gray-500 dark:text-zinc-400">Loading…</p>
       </div>
     }>
