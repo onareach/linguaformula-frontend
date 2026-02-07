@@ -25,7 +25,7 @@ export default function TrueFalseQuestion({ stem, answers, value, onChange }: Tr
               value={String(a.answer_id)}
               checked={value === a.answer_id}
               onChange={() => onChange(a.answer_id)}
-              style={{ marginRight: "8px" }}
+              style={{ marginRight: "8px", accentColor: "#6b7c3d" }}
             />
             {a.answer_text}
           </label>

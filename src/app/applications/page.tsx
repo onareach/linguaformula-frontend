@@ -64,14 +64,14 @@ export default function Applications() {
       <div style={{ marginBottom: '20px' }}>
         <Link href="/" style={{ 
           textDecoration: 'underline', 
-          color: 'blue', 
+          color: '#556b2f', 
           marginRight: '20px' 
         }}>
           ← Back to Formulas
         </Link>
         <Link href="/applications/create" style={{ 
           textDecoration: 'underline', 
-          color: 'green' 
+          color: '#556b2f' 
         }}>
           + Create New Application
         </Link>
@@ -98,7 +98,7 @@ export default function Applications() {
           <p>No applications found.</p>
           <Link href="/applications/create" style={{ 
             textDecoration: 'underline', 
-            color: 'green' 
+            color: '#556b2f' 
           }}>
             Create the first application
           </Link>
@@ -121,7 +121,7 @@ export default function Applications() {
                   >
                     <h3 style={{ 
                       margin: '0 0 10px 0', 
-                      color: 'blue',
+                      color: '#556b2f',
                       cursor: 'pointer',
                       fontSize: '20px'
                     }}>
@@ -169,7 +169,7 @@ export default function Applications() {
                   <Link 
                     href={`/applications/${application.id}/link-formulas`}
                     style={{ 
-                      backgroundColor: '#007bff',
+                      backgroundColor: '#6b7c3d',
                       color: 'white',
                       padding: '8px 12px',
                       textDecoration: 'none',

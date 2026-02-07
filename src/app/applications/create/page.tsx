@@ -66,7 +66,7 @@ export default function CreateApplication() {
       <div style={{ marginBottom: '20px' }}>
         <Link href="/applications" style={{ 
           textDecoration: 'underline', 
-          color: 'blue' 
+          color: '#556b2f' 
         }}>
           ← Back to Applications
         </Link>

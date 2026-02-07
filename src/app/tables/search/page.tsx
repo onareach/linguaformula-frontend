@@ -137,14 +137,14 @@ export default function AdvancedSearch() {
         <div style={{ marginBottom: '20px' }}>
           <Link href="/tables" style={{ 
             textDecoration: 'underline', 
-            color: 'blue', 
+            color: '#556b2f', 
             marginRight: '20px' 
           }}>
             ← Back to Tables
           </Link>
           <Link href="/" style={{ 
             textDecoration: 'underline', 
-            color: 'green'
+            color: '#556b2f'
           }}>
             Home
           </Link>

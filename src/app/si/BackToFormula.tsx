@@ -16,7 +16,7 @@ export default function BackToFormula() {
       onClick={handleClick}
       style={{
         textDecoration: "underline",
-        color: "blue",
+        color: "#556b2f",
         cursor: "pointer",
         display: "inline-block",
       }}

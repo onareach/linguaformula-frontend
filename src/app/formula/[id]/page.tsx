@@ -93,7 +93,7 @@ function FormulaPageContent() {
         href={getBackLink()}
         style={{ 
           textDecoration: "underline", 
-          color: "blue", 
+          color: "#556b2f", 
           cursor: "pointer",
           display: "inline-block",
           marginBottom: "16px"
@@ -114,7 +114,7 @@ function FormulaPageContent() {
           href={`/formula/${id}/quiz`}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: '#2563eb', textDecoration: 'underline', fontWeight: 500 }}
+          style={{ color: '#556b2f', textDecoration: 'underline', fontWeight: 500 }}
         >
           Quiz Me!
         </a>
@@ -189,7 +189,7 @@ function FormulaPageContent() {
                         href="/si"
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: "#2563eb", textDecoration: "underline" }}
+                        style={{ color: "#556b2f", textDecoration: "underline" }}
                       >
                         SI
                       </Link>
@@ -237,7 +237,7 @@ function FormulaPageContent() {
         </MathJaxContext>
       <Link
         href={getBackLink()}
-        style={{ textDecoration: "underline", color: "blue", cursor: "pointer" }}
+        style={{ textDecoration: "underline", color: "#556b2f", cursor: "pointer" }}
       >
         ← Back to Formula List
       </Link>

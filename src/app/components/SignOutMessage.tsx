@@ -28,8 +28,14 @@ export default function SignOutMessage() {
   if (!show) return null;
 
   return (
-    <p className="text-[#6b7c3d] font-medium text-center mb-4">
-      you have signed out successfully.
-    </p>
+    <div
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded shadow-md bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600"
+      role="status"
+      aria-live="polite"
+    >
+      <p className="text-[#6b7c3d] font-medium text-center whitespace-nowrap">
+        you have signed out successfully.
+      </p>
+    </div>
   );
 }

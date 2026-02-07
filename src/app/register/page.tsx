@@ -55,17 +55,20 @@ function RegisterContent() {
     }
   }
 
-  if (showSuccess) {
-    return (
-      <div className="max-w-md mx-auto text-nav">
-        <p className="text-[#6b7c3d] font-medium">your account has been created.</p>
-        <p className="mt-2 text-sm">taking you back…</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-md mx-auto text-nav">
+    <div className="max-w-md mx-auto text-nav relative">
+      {showSuccess && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center pt-24"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="px-4 py-3 rounded shadow-lg bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600">
+            <p className="text-[#6b7c3d] font-medium">your account has been created.</p>
+            <p className="mt-1 text-sm text-gray-600 dark:text-zinc-400">taking you back…</p>
+          </div>
+        </div>
+      )}
       <h1 className="text-2xl font-bold mb-6">create an account</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <p className="text-red-600 text-sm">{error}</p>}
@@ -117,6 +120,7 @@ function RegisterContent() {
     </div>
   );
 }
+
 
 export default function RegisterPage() {
   return (

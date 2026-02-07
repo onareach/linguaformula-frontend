@@ -85,7 +85,7 @@ function QuizContent() {
         <button
           type="button"
           onClick={() => window.close()}
-          style={{ color: "#2563eb", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "inherit" }}
+          style={{ color: "#556b2f", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "inherit" }}
         >
           ← Back to Formula
         </button>
@@ -193,7 +193,7 @@ function QuizContent() {
 
   const buttonStyle = {
     padding: "8px 16px",
-    background: "#2563eb",
+    background: "#6b7c3d",
     color: "white" as const,
     border: "none",
     borderRadius: "6px",
@@ -208,7 +208,7 @@ function QuizContent() {
   const backButtonStyle = {
     ...buttonStyle,
     background: "transparent",
-    color: "#2563eb",
+    color: "#556b2f",
     padding: 0,
     textDecoration: "underline",
   };

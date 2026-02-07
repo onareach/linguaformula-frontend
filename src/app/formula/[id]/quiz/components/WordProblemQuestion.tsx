@@ -21,7 +21,8 @@ export default function WordProblemQuestion({ stem, value, onChange, inputId = "
         placeholder="Enter a number or value"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        style={{ padding: "8px 12px", fontSize: "16px", maxWidth: "300px", width: "100%" }}
+        autoComplete="off"
+        style={{ padding: "8px 12px", fontSize: "16px", maxWidth: "300px", width: "100%", background: "white", border: "1px solid #ccc" }}
       />
     </div>
   );

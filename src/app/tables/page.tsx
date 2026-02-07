@@ -269,7 +269,7 @@ export default function Tables() {
                 <td style={{ padding: '12px' }}>
                   <Link 
                     href={`/applications/${application.id}`}
-                    style={{ color: 'blue', textDecoration: 'underline' }}
+                    style={{ color: '#556b2f', textDecoration: 'underline' }}
                   >
                     {application.title}
                   </Link>
@@ -314,21 +314,21 @@ export default function Tables() {
         <div style={{ marginBottom: '20px' }}>
           <Link href="/" style={{ 
             textDecoration: 'underline', 
-            color: 'blue', 
+            color: '#556b2f', 
             marginRight: '20px' 
           }}>
             ← Back to Home
           </Link>
           <Link href="/applications" style={{ 
             textDecoration: 'underline', 
-            color: 'green',
+            color: '#556b2f',
             marginRight: '20px'
           }}>
             View Applications
           </Link>
           <Link href="/tables/search" style={{ 
             textDecoration: 'underline', 
-            color: 'purple'
+            color: '#556b2f'
           }}>
             Advanced Search
           </Link>
