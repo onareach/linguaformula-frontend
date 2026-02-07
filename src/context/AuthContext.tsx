@@ -67,31 +67,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refetch]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await authFetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    if (!res.ok) return { error: data.error || 'Login failed' };
-    setUser(data.user);
-    setSessionStorageSession();
-    if (typeof window !== 'undefined') window.location.href = '/';
-    return {};
+    try {
+      const res = await authFetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      let data: { user?: unknown; error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        return { error: 'Something went wrong. Please try again.' };
+      }
+      if (!res.ok) return { error: data.error || 'Login failed' };
+      setUser(data.user as User);
+      setSessionStorageSession();
+      if (typeof window !== 'undefined') window.location.href = '/';
+      return {};
+    } catch {
+      return { error: 'Something went wrong. Please try again.' };
+    }
   }, []);
 
   const register = useCallback(async (email: string, password: string, displayName?: string) => {
-    const res = await authFetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, display_name: displayName || undefined }),
-    });
-    const data = await res.json();
-    if (!res.ok) return { error: data.error || 'Registration failed' };
-    setUser(data.user);
-    setSessionStorageSession();
-    if (typeof window !== 'undefined') window.location.href = '/';
-    return {};
+    try {
+      const res = await authFetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, display_name: displayName || undefined }),
+      });
+      let data: { user?: unknown; error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        return { error: 'Something went wrong. Please try again.' };
+      }
+      if (!res.ok) return { error: data.error || 'Registration failed' };
+      setUser(data.user as User);
+      setSessionStorageSession();
+      if (typeof window !== 'undefined') window.location.href = '/';
+      return {};
+    } catch {
+      return { error: 'Something went wrong. Please try again.' };
+    }
   }, []);
 
   const logout = useCallback(async () => {

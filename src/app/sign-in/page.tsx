@@ -24,11 +24,14 @@ export default function SignInPage() {
     e.preventDefault();
     setError('');
     setSubmitting(true);
-    const { error: err } = await login(email, password);
-    setSubmitting(false);
-    if (err) {
-      setError(err);
-      return;
+    try {
+      const { error: err } = await login(email, password);
+      if (err) {
+        setError(err);
+        return;
+      }
+    } finally {
+      setSubmitting(false);
     }
   }
 

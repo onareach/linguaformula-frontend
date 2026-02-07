@@ -29,11 +29,14 @@ export default function RegisterPage() {
       return;
     }
     setSubmitting(true);
-    const { error: err } = await register(email, password, displayName || undefined);
-    setSubmitting(false);
-    if (err) {
-      setError(err);
-      return;
+    try {
+      const { error: err } = await register(email, password, displayName || undefined);
+      if (err) {
+        setError(err);
+        return;
+      }
+    } finally {
+      setSubmitting(false);
     }
   }
 

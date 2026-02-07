@@ -11,7 +11,7 @@ export default function Navigation() {
   if (pathname === '/') return null;
 
   return (
-    <nav className="mt-12 md:mt-0 w-full md:w-1/4 md:order-2" suppressHydrationWarning>
+    <nav className="order-2 mt-12 w-full md:w-1/4 md:order-2 md:mt-0" suppressHydrationWarning>
       <div className="mb-4 text-center">
         <Image
           src="/logo.png"
