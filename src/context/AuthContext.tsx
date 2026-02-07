@@ -18,7 +18,6 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 const API = process.env.NEXT_PUBLIC_API_URL || '';
 const SESSION_KEY = 'linguaformula_auth_session';
-const JUST_LOGGED_IN_COOKIE = 'linguaformula_just_logged_in';
 
 function authFetch(path: string, options: RequestInit = {}) {
   return fetch(`${API}${path}`, { ...options, credentials: 'include' });
@@ -37,28 +36,13 @@ function clearSessionStorageSession() {
   if (typeof window !== 'undefined') sessionStorage.removeItem(SESSION_KEY);
 }
 
-function hasJustLoggedInCookie(): boolean {
-  if (typeof document === 'undefined') return false;
-  return document.cookie.includes(`${JUST_LOGGED_IN_COOKIE}=`);
-}
-
-function setJustLoggedInCookie() {
-  if (typeof document === 'undefined') return;
-  document.cookie = `${JUST_LOGGED_IN_COOKIE}=1; max-age=60; path=/; SameSite=Lax`;
-}
-
-function clearJustLoggedInCookie() {
-  if (typeof document === 'undefined') return;
-  document.cookie = `${JUST_LOGGED_IN_COOKIE}=; max-age=0; path=/`;
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refetch = useCallback(async () => {
     try {
-      if (!hasSessionStorageSession() && !hasJustLoggedInCookie()) {
+      if (!hasSessionStorageSession()) {
         await authFetch('/api/auth/logout', { method: 'POST' });
         setUser(null);
         setLoading(false);
@@ -71,24 +55,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch {
         setUser(null);
         clearSessionStorageSession();
-        clearJustLoggedInCookie();
         setLoading(false);
         return;
       }
       const nextUser = data.user || null;
       setUser(nextUser);
-      if (nextUser) {
-        setSessionStorageSession();
-        clearJustLoggedInCookie();
-      } else {
+      if (nextUser) setSessionStorageSession();
+      else {
         clearSessionStorageSession();
-        clearJustLoggedInCookie();
         await authFetch('/api/auth/logout', { method: 'POST' });
       }
     } catch {
       setUser(null);
       clearSessionStorageSession();
-      clearJustLoggedInCookie();
     } finally {
       setLoading(false);
     }
@@ -114,8 +93,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) return { error: data.error || 'Login failed' };
       setUser(data.user as User);
       setSessionStorageSession();
-      setJustLoggedInCookie();
-      if (typeof window !== 'undefined') window.location.href = '/';
       return {};
     } catch {
       return { error: 'Something went wrong. Please try again.' };
@@ -138,8 +115,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) return { error: data.error || 'Registration failed' };
       setUser(data.user as User);
       setSessionStorageSession();
-      setJustLoggedInCookie();
-      if (typeof window !== 'undefined') window.location.href = '/';
       return {};
     } catch {
       return { error: 'Something went wrong. Please try again.' };
@@ -148,7 +123,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     clearSessionStorageSession();
-    clearJustLoggedInCookie();
     await authFetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
   }, []);
