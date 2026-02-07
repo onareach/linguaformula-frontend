@@ -82,24 +82,23 @@ h4 {
   }
 }
 
-/* Loading spinner */
+/* Loading spinner – matches site palette (nav/copy grays) */
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgb(229 231 235); /* gray-200 */
+  border-top-color: rgb(107 114 128); /* gray-500, .text-nav */
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.9s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-color-scheme: dark) {
   .spinner {
-    border-color: #374151; /* gray-700 */
-    border-top-color: #60a5fa; /* blue-400 */
+    border-color: rgb(63 63 70); /* zinc-700 */
+    border-top-color: rgb(161 161 170); /* zinc-400, nav in dark */
   }
 }

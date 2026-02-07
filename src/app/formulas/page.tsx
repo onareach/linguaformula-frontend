@@ -464,9 +464,9 @@ function FormulasContent() {
         )}
 
         {loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-            <div className="spinner"></div>
-            <p style={{ color: '#666', fontSize: '16px', marginTop: '20px' }}>Loading formulas...</p>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="spinner" aria-hidden />
+            <p className="mt-4 text-sm text-gray-500 dark:text-zinc-400">Loading formulas…</p>
           </div>
         ) : error ? (
           <p style={{ color: 'red', fontWeight: 'bold' }}>
@@ -555,9 +555,9 @@ function FormulasContent() {
 export default function Formulas() {
   return (
     <Suspense fallback={
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-        <div className="spinner"></div>
-        <p style={{ color: '#666', fontSize: '16px', marginTop: '20px' }}>Loading...</p>
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="spinner" aria-hidden />
+        <p className="mt-4 text-sm text-gray-500 dark:text-zinc-400">Loading…</p>
       </div>
     }>
       <FormulasContent />
