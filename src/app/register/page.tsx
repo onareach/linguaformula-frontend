@@ -2,24 +2,38 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PasswordInput } from '@/app/components/PasswordInput';
 
+function safeFrom(from: string | null): string {
+  if (!from || !from.startsWith('/') || from.startsWith('//')) return '/';
+  return from;
+}
+
 export default function RegisterPage() {
+  const searchParams = useSearchParams();
+  const from = safeFrom(searchParams.get('from'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const { register, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (user && !error) router.replace('/');
-  }, [user, error, router]);
+    if (user && !error && !showSuccess) router.replace(from);
+  }, [user, error, showSuccess, from, router]);
 
-  if (user && !error) return null;
+  useEffect(() => {
+    if (!showSuccess) return;
+    const t = setTimeout(() => router.replace(from), 1500);
+    return () => clearTimeout(t);
+  }, [showSuccess, from, router]);
+
+  if (user && !error && !showSuccess) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,9 +49,19 @@ export default function RegisterPage() {
         setError(err);
         return;
       }
+      setShowSuccess(true);
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (showSuccess) {
+    return (
+      <div className="max-w-md mx-auto">
+        <p className="text-green-600 dark:text-green-400 font-medium">Your account has been created.</p>
+        <p className="mt-2 text-gray-600 dark:text-zinc-400 text-sm">Taking you back…</p>
+      </div>
+    );
   }
 
   return (
@@ -86,7 +110,7 @@ export default function RegisterPage() {
         </button>
       </form>
       <p className="mt-4 text-sm text-gray-600 dark:text-zinc-400">
-        Already have an account? <Link href="/sign-in" className="text-blue-600 hover:underline">Sign in</Link>
+        Already have an account? <Link href={`/sign-in?from=${encodeURIComponent(from)}`} className="text-blue-600 hover:underline">Sign in</Link>
       </p>
     </div>
   );

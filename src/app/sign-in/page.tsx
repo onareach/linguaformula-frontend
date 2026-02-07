@@ -2,23 +2,37 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PasswordInput } from '@/app/components/PasswordInput';
 
+function safeFrom(from: string | null): string {
+  if (!from || !from.startsWith('/') || from.startsWith('//')) return '/';
+  return from;
+}
+
 export default function SignInPage() {
+  const searchParams = useSearchParams();
+  const from = safeFrom(searchParams.get('from'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const { login, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (user && !error) router.replace('/');
-  }, [user, error, router]);
+    if (user && !error && !showSuccess) router.replace(from);
+  }, [user, error, showSuccess, from, router]);
 
-  if (user && !error) return null;
+  useEffect(() => {
+    if (!showSuccess) return;
+    const t = setTimeout(() => router.replace(from), 1500);
+    return () => clearTimeout(t);
+  }, [showSuccess, from, router]);
+
+  if (user && !error && !showSuccess) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,9 +44,19 @@ export default function SignInPage() {
         setError(err);
         return;
       }
+      setShowSuccess(true);
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (showSuccess) {
+    return (
+      <div className="max-w-md mx-auto">
+        <p className="text-green-600 dark:text-green-400 font-medium">You have signed in successfully.</p>
+        <p className="mt-2 text-gray-600 dark:text-zinc-400 text-sm">Taking you back…</p>
+      </div>
+    );
   }
 
   return (
@@ -69,7 +93,7 @@ export default function SignInPage() {
         </button>
       </form>
       <p className="mt-4 text-sm text-gray-600 dark:text-zinc-400">
-        Don&apos;t have an account? <Link href="/register" className="text-blue-600 hover:underline">Register</Link>
+        Don&apos;t have an account? <Link href={`/register?from=${encodeURIComponent(from)}`} className="text-blue-600 hover:underline">Register</Link>
       </p>
     </div>
   );
