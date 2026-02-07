@@ -25,7 +25,7 @@ export default function AccountPage() {
   }, [user]);
 
   if (loading || !user) {
-    return <div className="max-w-md mx-auto">Loading…</div>;
+    return <div className="max-w-md mx-auto text-nav">loading…</div>;
   }
 
   async function handleProfileSubmit(e: React.FormEvent) {
@@ -36,7 +36,7 @@ export default function AccountPage() {
     const { error } = await updateProfile({ email, display_name: displayName });
     setSubmittingProfile(false);
     if (error) setProfileError(error);
-    else setProfileSuccess('Profile updated.');
+    else setProfileSuccess('profile updated.');
   }
 
   async function handleLogout() {
@@ -45,16 +45,16 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-8">
-      <h1 className="text-2xl font-bold">Account</h1>
+    <div className="max-w-md mx-auto space-y-8 text-nav">
+      <h1 className="text-2xl font-bold">account</h1>
 
       <section>
-        <h2 className="text-lg font-semibold mb-3">Profile</h2>
+        <h2 className="text-lg font-semibold mb-3">profile</h2>
         <form onSubmit={handleProfileSubmit} className="space-y-4">
           {profileError && <p className="text-red-600 text-sm">{profileError}</p>}
-          {profileSuccess && <p className="text-green-600 text-sm">{profileSuccess}</p>}
+          {profileSuccess && <p className="text-[#6b7c3d] text-sm">{profileSuccess}</p>}
           <div>
-            <label htmlFor="account-email" className="block text-sm font-medium mb-1">Email</label>
+            <label htmlFor="account-email" className="block text-sm font-medium mb-1">email</label>
             <input
               id="account-email"
               type="email"
@@ -65,7 +65,7 @@ export default function AccountPage() {
             />
           </div>
           <div>
-            <label htmlFor="account-displayName" className="block text-sm font-medium mb-1">Display name</label>
+            <label htmlFor="account-displayName" className="block text-sm font-medium mb-1">display name</label>
             <input
               id="account-displayName"
               type="text"
@@ -77,9 +77,9 @@ export default function AccountPage() {
           <button
             type="submit"
             disabled={submittingProfile}
-            className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50"
+            className="py-2 px-4 bg-[#6b7c3d] hover:bg-[#7a8f4a] text-white rounded disabled:opacity-50"
           >
-            {submittingProfile ? 'Saving…' : 'Save profile'}
+            {submittingProfile ? 'saving…' : 'save profile'}
           </button>
         </form>
       </section>
@@ -88,9 +88,9 @@ export default function AccountPage() {
         <button
           type="button"
           onClick={handleLogout}
-          className="py-2 px-4 border border-gray-300 dark:border-zinc-600 rounded hover:bg-gray-100 dark:hover:bg-zinc-800"
+          className="py-2 px-4 border border-gray-300 dark:border-zinc-600 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-nav"
         >
-          Sign out
+          sign out
         </button>
       </section>
     </div>

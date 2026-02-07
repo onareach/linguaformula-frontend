@@ -52,20 +52,20 @@ function SignInContent() {
 
   if (showSuccess) {
     return (
-      <div className="max-w-md mx-auto">
-        <p className="text-green-600 dark:text-green-400 font-medium">You have signed in successfully.</p>
-        <p className="mt-2 text-gray-600 dark:text-zinc-400 text-sm">Taking you back…</p>
+      <div className="max-w-md mx-auto text-nav">
+        <p className="text-[#6b7c3d] font-medium">you have signed in successfully.</p>
+        <p className="mt-2 text-sm">taking you back…</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Sign in</h1>
+    <div className="max-w-md mx-auto text-nav">
+      <h1 className="text-2xl font-bold mb-6">sign in</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <p className="text-red-600 text-sm">{error}</p>}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+          <label htmlFor="email" className="block text-sm font-medium mb-1">email</label>
           <input
             id="email"
             type="email"
@@ -78,30 +78,32 @@ function SignInContent() {
         </div>
         <PasswordInput
           id="password"
-          label="Password"
+          label="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="off"
         />
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50"
-        >
-          {submitting ? 'Signing in…' : 'Sign in'}
-        </button>
+        <div className="flex flex-col items-center">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-[35%] py-2 px-4 bg-[#6b7c3d] hover:bg-[#7a8f4a] text-white rounded disabled:opacity-50"
+          >
+            {submitting ? 'signing in…' : 'sign in'}
+          </button>
+          <p className="mt-4 text-sm text-center">
+            don&apos;t have an account? <Link href={`/register?from=${encodeURIComponent(from)}`} className="text-nav-hover underline">register</Link>
+          </p>
+        </div>
       </form>
-      <p className="mt-4 text-sm text-gray-600 dark:text-zinc-400">
-        Don&apos;t have an account? <Link href={`/register?from=${encodeURIComponent(from)}`} className="text-blue-600 hover:underline">Register</Link>
-      </p>
     </div>
   );
 }
 
 export default function SignInPage() {
   return (
-    <Suspense fallback={<div className="max-w-md mx-auto">Loading…</div>}>
+    <Suspense fallback={<div className="max-w-md mx-auto text-nav">loading…</div>}>
       <SignInContent />
     </Suspense>
   );

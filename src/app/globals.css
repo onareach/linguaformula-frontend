@@ -27,11 +27,30 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Accessibility: visible focus for keyboard users only (no change for mouse) */
+/* Accessibility: visible focus for keyboard users only (no change for mouse) – olive to match buttons */
 *:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #6b7c3d;
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* Faint olive background for autofilled inputs (override browser default blue) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #e8ebdf inset;
+  box-shadow: 0 0 0 30px #e8ebdf inset;
+}
+
+@media (prefers-color-scheme: dark) {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(107, 124, 61, 0.2) inset;
+    box-shadow: 0 0 0 30px rgba(107, 124, 61, 0.2) inset;
+  }
 }
 
 /* Screen-reader only: hide visually, keep for assistive tech */
@@ -54,6 +73,11 @@ h4 {
   text-wrap: balance;
   font-weight: inherit;
 }
+
+/* Sign-in / Account page text – revert reference:
+   Font size: default (1rem), use text-base if explicit.
+   Color: default foreground (--foreground), i.e. text-gray-900 dark:text-zinc-200 or inherit from body.
+*/
 
 /* Navigation styles */
 .text-copy {

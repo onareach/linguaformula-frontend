@@ -39,7 +39,7 @@ function RegisterContent() {
     e.preventDefault();
     setError('');
     if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError('password must be at least 8 characters');
       return;
     }
     setSubmitting(true);
@@ -57,20 +57,20 @@ function RegisterContent() {
 
   if (showSuccess) {
     return (
-      <div className="max-w-md mx-auto">
-        <p className="text-green-600 dark:text-green-400 font-medium">Your account has been created.</p>
-        <p className="mt-2 text-gray-600 dark:text-zinc-400 text-sm">Taking you back…</p>
+      <div className="max-w-md mx-auto text-nav">
+        <p className="text-[#6b7c3d] font-medium">your account has been created.</p>
+        <p className="mt-2 text-sm">taking you back…</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Create an account</h1>
+    <div className="max-w-md mx-auto text-nav">
+      <h1 className="text-2xl font-bold mb-6">create an account</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <p className="text-red-600 text-sm">{error}</p>}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+          <label htmlFor="email" className="block text-sm font-medium mb-1">email</label>
           <input
             id="email"
             type="email"
@@ -83,7 +83,7 @@ function RegisterContent() {
         </div>
         <PasswordInput
           id="password"
-          label="Password (at least 8 characters)"
+          label="password (at least 8 characters)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -91,7 +91,7 @@ function RegisterContent() {
           autoComplete="new-password"
         />
         <div>
-          <label htmlFor="displayName" className="block text-sm font-medium mb-1">Display name (optional)</label>
+          <label htmlFor="displayName" className="block text-sm font-medium mb-1">display name (optional)</label>
           <input
             id="displayName"
             type="text"
@@ -101,24 +101,26 @@ function RegisterContent() {
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
           />
         </div>
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50"
-        >
-          {submitting ? 'Creating account…' : 'Register'}
-        </button>
+        <div className="flex flex-col items-center">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-[35%] py-2 px-4 bg-[#6b7c3d] hover:bg-[#7a8f4a] text-white rounded disabled:opacity-50"
+          >
+            {submitting ? 'creating account…' : 'register'}
+          </button>
+          <p className="mt-4 text-sm text-center">
+            already have an account? <Link href={`/sign-in?from=${encodeURIComponent(from)}`} className="text-nav-hover underline">sign in</Link>
+          </p>
+        </div>
       </form>
-      <p className="mt-4 text-sm text-gray-600 dark:text-zinc-400">
-        Already have an account? <Link href={`/sign-in?from=${encodeURIComponent(from)}`} className="text-blue-600 hover:underline">Sign in</Link>
-      </p>
     </div>
   );
 }
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="max-w-md mx-auto">Loading…</div>}>
+    <Suspense fallback={<div className="max-w-md mx-auto text-nav">loading…</div>}>
       <RegisterContent />
     </Suspense>
   );

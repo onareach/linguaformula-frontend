@@ -28,8 +28,8 @@ export default function SignOutMessage() {
   if (!show) return null;
 
   return (
-    <p className="text-green-600 dark:text-green-400 font-medium text-center mb-4">
-      You have signed out successfully.
+    <p className="text-[#6b7c3d] font-medium text-center mb-4">
+      you have signed out successfully.
     </p>
   );
 }
