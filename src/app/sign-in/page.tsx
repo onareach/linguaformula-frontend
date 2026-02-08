@@ -60,7 +60,6 @@ function SignInContent() {
         >
           <div className="px-4 py-3 rounded shadow-lg bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600">
             <p className="text-[#6b7c3d] font-medium">you have signed in successfully.</p>
-            <p className="mt-1 text-sm text-gray-600 dark:text-zinc-400">taking you back…</p>
           </div>
         </div>
       )}
