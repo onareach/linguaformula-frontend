@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, []);
 
-  const updateProfile = useCallback(async (updates: { email?: string; display_name?: string; new_password?: string }) => {
+  const updateProfile = useCallback(async (updates: { email?: string; display_name?: string; new_password?: string; current_password?: string }) => {
     const res = await authFetch('/api/auth/me', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },

@@ -88,6 +88,9 @@ function SignInContent() {
           autoComplete="off"
         />
         <div className="flex flex-col items-center">
+          <p className="mb-2 text-sm">
+            <Link href="/forgot-password" className="text-nav-hover underline">forgot password?</Link>
+          </p>
           <button
             type="submit"
             disabled={submitting}
