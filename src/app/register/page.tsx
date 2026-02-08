@@ -108,7 +108,7 @@ function RegisterContent() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-[35%] py-2 px-4 bg-[#6b7c3d] hover:bg-[#7a8f4a] text-white rounded disabled:opacity-50"
+            className="w-[35%] min-w-[10rem] py-2 px-4 bg-[#6b7c3d] hover:bg-[#7a8f4a] text-white rounded disabled:opacity-50 whitespace-nowrap"
           >
             {submitting ? 'creating account…' : 'register'}
           </button>
