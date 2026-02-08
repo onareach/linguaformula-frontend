@@ -154,7 +154,7 @@ export default function Navigation() {
             className="relative w-full max-w-[280px] bg-white dark:bg-zinc-900 shadow-xl flex flex-col overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700">
+            <div className="flex items-center justify-center p-4 border-b border-gray-200 dark:border-zinc-700">
               <Image
                 src="/logo.png"
                 alt=""
@@ -162,16 +162,6 @@ export default function Navigation() {
                 height={80}
                 className="inline-block"
               />
-              <button
-                type="button"
-                onClick={closeMenu}
-                aria-label="Close menu"
-                className="p-2 rounded-md text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
             </div>
             <div className="p-6">
               <NavLinks pathname={pathname} user={user} onSignOut={handleSignOut} onLinkClick={closeMenu} />
