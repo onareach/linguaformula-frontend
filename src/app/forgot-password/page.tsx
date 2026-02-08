@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-const API = process.env.NEXT_PUBLIC_API_URL || '';
-
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -17,11 +15,8 @@ export default function ForgotPasswordPage() {
     setMessage('');
     setSubmitting(true);
     try {
-      if (!API) {
-        setError('Server URL is not configured. Please try again later.');
-        return;
-      }
-      const res = await fetch(`${API}/api/auth/forgot-password`, {
+      // Use same-origin URL so the request is proxied by Next/Vercel (no CORS)
+      const res = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
