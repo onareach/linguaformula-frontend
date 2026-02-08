@@ -10,7 +10,7 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<{ error?: string }>;
   register: (email: string, password: string, displayName?: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
-  updateProfile: (updates: { email?: string; display_name?: string; new_password?: string }) => Promise<{ error?: string }>;
+  updateProfile: (updates: { email?: string; display_name?: string; new_password?: string; current_password?: string }) => Promise<{ error?: string }>;
   refetch: () => Promise<void>;
 };
 
