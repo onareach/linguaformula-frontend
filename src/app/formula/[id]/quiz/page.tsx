@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import MultipleChoiceQuestion from "./components/MultipleChoiceQuestion";
 import TrueFalseQuestion from "./components/TrueFalseQuestion";
 import WordProblemQuestion from "./components/WordProblemQuestion";
@@ -82,13 +83,12 @@ function QuizContent() {
     return (
       <div style={{ padding: "20px" }}>
         <p>No questions for this formula yet.</p>
-        <button
-          type="button"
-          onClick={() => window.close()}
-          style={{ color: "#556b2f", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "inherit" }}
+        <Link
+          href={`/formula/${id}`}
+          style={{ color: "#556b2f", textDecoration: "underline" }}
         >
           ← Back to Formula
-        </button>
+        </Link>
       </div>
     );
   }
@@ -201,27 +201,24 @@ function QuizContent() {
     fontWeight: 500,
   };
 
-  const closeAndReturn = () => {
-    window.close();
-  };
-
-  const backButtonStyle = {
+  const backLinkStyle = {
     ...buttonStyle,
     background: "transparent",
     color: "#556b2f",
     padding: 0,
     textDecoration: "underline",
+    marginBottom: "16px",
+    display: "inline-block",
   };
 
   return (
     <div style={{ padding: "20px", maxWidth: "720px" }}>
-      <button
-        type="button"
-        onClick={closeAndReturn}
-        style={{ ...backButtonStyle, marginBottom: "16px", cursor: "pointer", border: "none", fontSize: "inherit" }}
+      <Link
+        href={`/formula/${id}`}
+        style={backLinkStyle}
       >
         ← Back to Formula
-      </button>
+      </Link>
       <h1 style={{ fontSize: "24px", marginBottom: "8px" }}>Quiz</h1>
       <p style={{ color: "#666", marginBottom: "24px" }}>
         Question {currentIndex + 1} of {questions.length}
@@ -253,9 +250,9 @@ function QuizContent() {
                 Next question
               </button>
             ) : (
-              <button type="button" onClick={closeAndReturn} style={buttonStyle}>
+              <Link href={`/formula/${id}`} style={{ ...buttonStyle, textDecoration: "none", display: "inline-block" }}>
                 Back to Formula
-              </button>
+              </Link>
             )}
           </div>
         </>
