@@ -17,20 +17,30 @@ export default function ForgotPasswordPage() {
     setMessage('');
     setSubmitting(true);
     try {
+      if (!API) {
+        setError('Server URL is not configured. Please try again later.');
+        return;
+      }
       const res = await fetch(`${API}/api/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
-      const data = await res.json();
+      let data: { ok?: boolean; message?: string; error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        setError(res.ok ? 'Invalid response from server.' : `Request failed (${res.status}). Please try again.`);
+        return;
+      }
       if (res.ok && data.ok) {
         setMessage(data.message || "If an account exists with that email, we've sent a reset link.");
         setEmail('');
       } else {
-        setError(data.error || 'Something went wrong. Please try again.');
+        setError(data.error || `Request failed (${res.status}). Please try again.`);
       }
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err) {
+      setError('Network error. Check your connection and try again.');
     } finally {
       setSubmitting(false);
     }
