@@ -42,12 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refetch = useCallback(async () => {
     try {
-      if (!hasSessionStorageSession()) {
-        await authFetch('/api/auth/logout', { method: 'POST' });
-        setUser(null);
-        setLoading(false);
-        return;
-      }
+      // Always call /me so new tabs (e.g. quiz opened with target="_blank") get user from cookie
       const res = await authFetch('/api/auth/me');
       let data: { user?: User | null } = {};
       try {
