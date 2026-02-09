@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-
-const API = process.env.NEXT_PUBLIC_API_URL || '';
+import { authFetch } from '@/lib/authClient';
 
 type Institution = {
   id: number;
@@ -23,10 +22,6 @@ type Course = {
   course_type: string | null;
   institution_name: string | null;
 };
-
-function authFetch(path: string, options: RequestInit = {}) {
-  return fetch(`${API}${path}`, { ...options, credentials: 'include' });
-}
 
 export default function CoursesPage() {
   const { user, loading } = useAuth();

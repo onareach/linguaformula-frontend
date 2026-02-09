@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { authFetch, setStoredToken, clearStoredToken, getStoredToken } from '@/lib/authClient';
 
 export type User = { id: number; email: string; display_name: string | null };
 
@@ -16,12 +17,7 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const API = process.env.NEXT_PUBLIC_API_URL || '';
 const SESSION_KEY = 'linguaformula_auth_session';
-
-function authFetch(path: string, options: RequestInit = {}) {
-  return fetch(`${API}${path}`, { ...options, credentials: 'include' });
-}
 
 function hasSessionStorageSession(): boolean {
   if (typeof window === 'undefined') return false;
@@ -42,9 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refetch = useCallback(async () => {
     try {
-      // No sessionStorage = no "session" (e.g. user closed all tabs). Treat as logged out and clear cookie.
-      if (!hasSessionStorageSession()) {
+      // No sessionStorage and no stored JWT = no "session" (e.g. user closed all tabs). Treat as logged out.
+      const hasStoredToken = !!getStoredToken();
+      if (!hasSessionStorageSession() && !hasStoredToken) {
         await authFetch('/api/auth/logout', { method: 'POST' });
+        clearStoredToken();
         setUser(null);
         setLoading(false);
         return;
@@ -56,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch {
         setUser(null);
         clearSessionStorageSession();
+        clearStoredToken();
         setLoading(false);
         return;
       }
@@ -64,6 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (nextUser) setSessionStorageSession();
       else {
         clearSessionStorageSession();
+        clearStoredToken();
         await authFetch('/api/auth/logout', { method: 'POST' });
       }
     } catch {
@@ -92,6 +92,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: 'Something went wrong. Please try again.' };
       }
       if (!res.ok) return { error: data.error || 'Login failed' };
+      const token = (data as { token?: string }).token;
+      if (token) setStoredToken(token);
       setUser(data.user as User);
       setSessionStorageSession();
       return {};
@@ -114,6 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: 'Something went wrong. Please try again.' };
       }
       if (!res.ok) return { error: data.error || 'Registration failed' };
+      const token = (data as { token?: string }).token;
+      if (token) setStoredToken(token);
       setUser(data.user as User);
       setSessionStorageSession();
       return {};
@@ -124,6 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     clearSessionStorageSession();
+    clearStoredToken();
     await authFetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
   }, []);
