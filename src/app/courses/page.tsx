@@ -195,9 +195,14 @@ export default function CoursesPage() {
 
       {coursesError && <p className="text-red-600 text-sm mb-4">{coursesError}</p>}
       {coursesLoading ? (
-        <p className="text-sm text-gray-500 dark:text-zinc-400">loading courses…</p>
+        <div className="flex flex-col items-center gap-3 mb-8">
+          <div className="bouncing-dots" aria-hidden>
+            <span /><span /><span />
+          </div>
+          <p className="text-sm text-gray-500 dark:text-zinc-400">loading courses…</p>
+        </div>
       ) : courses.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-zinc-400 mb-4">You don’t have any courses yet.</p>
+        <p className="text-sm text-gray-500 dark:text-zinc-400 mb-6">You don’t have any courses yet.</p>
       ) : (
         <ul className="space-y-2 mb-6">
           {courses.map((c) => (
