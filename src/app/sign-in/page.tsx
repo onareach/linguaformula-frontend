@@ -52,7 +52,22 @@ function SignInContent() {
 
   return (
     <div className="max-w-md mx-auto text-nav relative">
-      {showSuccess && (
+      {submitting && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/10 dark:bg-black/20"
+          role="status"
+          aria-live="polite"
+          aria-label="Signing in"
+        >
+          <div className="px-5 py-4 rounded-lg shadow-lg bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 flex flex-col items-center gap-3">
+            <div className="bouncing-dots" aria-hidden>
+              <span /><span /><span />
+            </div>
+            <p className="text-sm text-gray-600 dark:text-zinc-400">Signing in…</p>
+          </div>
+        </div>
+      )}
+      {showSuccess && !submitting && (
         <div
           className="fixed inset-0 z-50 flex items-start justify-center pt-24"
           role="status"
