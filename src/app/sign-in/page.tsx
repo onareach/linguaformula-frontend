@@ -86,10 +86,7 @@ function SignInContent() {
           required
           autoComplete="off"
         />
-        <div className="flex flex-col items-center">
-          <p className="mb-2 text-sm">
-            <Link href="/forgot-password" className="text-nav-hover underline" aria-label="Forgot password? Reset it via email.">forgot password?</Link>
-          </p>
+        <div className="flex flex-col items-center gap-4 mt-6">
           <button
             type="submit"
             disabled={submitting}
@@ -97,7 +94,10 @@ function SignInContent() {
           >
             {submitting ? 'signing in…' : 'sign in'}
           </button>
-          <p className="mt-4 text-sm text-center">
+          <p className="text-sm">
+            <Link href="/forgot-password" className="text-nav-hover underline" aria-label="Forgot password? Reset it via email.">forgot password?</Link>
+          </p>
+          <p className="text-sm text-center">
             don&apos;t have an account? <Link href={`/register?from=${encodeURIComponent(from)}`} className="text-nav-hover underline">register</Link>
           </p>
         </div>

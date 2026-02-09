@@ -104,7 +104,7 @@ function RegisterContent() {
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
           />
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center mt-6">
           <button
             type="submit"
             disabled={submitting}

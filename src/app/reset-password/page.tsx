@@ -102,7 +102,7 @@ function ResetPasswordContent() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-[35%] min-w-[8.5rem] py-2 px-4 bg-[#6b7c3d] hover:bg-[#7a8f4a] text-white rounded disabled:opacity-50 whitespace-nowrap"
+            className="w-[39%] min-w-[9.5rem] py-2 px-4 bg-[#6b7c3d] hover:bg-[#7a8f4a] text-white rounded disabled:opacity-50 whitespace-nowrap"
           >
             {submitting ? 'updating…' : 'update password'}
           </button>

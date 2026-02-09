@@ -8,11 +8,13 @@ export default function ForgotPasswordPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [emailWasSent, setEmailWasSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setMessage('');
+    setEmailWasSent(false);
     setSubmitting(true);
     try {
       // Use same-origin URL so the request is proxied by Next/Vercel (no CORS)
@@ -21,7 +23,7 @@ export default function ForgotPasswordPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
-      let data: { ok?: boolean; message?: string; error?: string } = {};
+      let data: { ok?: boolean; sent?: boolean; message?: string; error?: string } = {};
       try {
         data = await res.json();
       } catch {
@@ -29,8 +31,11 @@ export default function ForgotPasswordPage() {
         return;
       }
       if (res.ok && data.ok) {
-        setMessage(data.message || "If an account exists with that email, we've sent a reset link.");
-        setEmail('');
+        setMessage(data.message || '');
+        if (data.sent) {
+          setEmail('');
+          setEmailWasSent(true);
+        }
       } else {
         setError(data.error || `Request failed (${res.status}). Please try again.`);
       }
@@ -44,9 +49,11 @@ export default function ForgotPasswordPage() {
   return (
     <div className="max-w-md mx-auto text-nav">
       <h1 className="text-2xl font-bold mb-6">forgot password</h1>
-      <p className="mb-4 text-sm text-gray-600 dark:text-zinc-400">
-        Enter your email and we&apos;ll send you a link to set a new password.
-      </p>
+      {!emailWasSent && (
+        <p className="mb-4 text-sm text-gray-600 dark:text-zinc-400">
+          Enter your email and we&apos;ll send you a link to set a new password.
+        </p>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <p className="text-red-600 text-sm">{error}</p>}
         {message && <p className="text-[#6b7c3d] text-sm">{message}</p>}
@@ -62,7 +69,7 @@ export default function ForgotPasswordPage() {
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
           />
         </div>
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-6 mt-6">
           <button
             type="submit"
             disabled={submitting}
