@@ -8,8 +8,8 @@ export type User = { id: number; email: string; display_name: string | null };
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ error?: string }>;
-  register: (email: string, password: string, displayName?: string) => Promise<{ error?: string }>;
+  login: (email: string, password: string) => Promise<{ error?: string; errorDetail?: string }>;
+  register: (email: string, password: string, displayName?: string) => Promise<{ error?: string; errorDetail?: string }>;
   logout: () => Promise<void>;
   updateProfile: (updates: { email?: string; display_name?: string; new_password?: string; current_password?: string }) => Promise<{ error?: string }>;
   refetch: () => Promise<void>;
@@ -79,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refetch]);
 
   const login = useCallback(async (email: string, password: string) => {
+    const friendly = 'Something went wrong. Please try again.';
     try {
       const res = await authFetch('/api/auth/login', {
         method: 'POST',
@@ -89,7 +90,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         data = await res.json();
       } catch {
-        return { error: 'Something went wrong. Please try again.' };
+        const detail = `Server returned invalid response (status ${res.status}). Is the backend running at ${process.env.NEXT_PUBLIC_API_URL || 'NEXT_PUBLIC_API_URL'}?`;
+        return { error: friendly, errorDetail: detail };
       }
       if (!res.ok) return { error: data.error || 'Login failed' };
       const token = (data as { token?: string }).token;
@@ -97,12 +99,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(data.user as User);
       setSessionStorageSession();
       return {};
-    } catch {
-      return { error: 'Something went wrong. Please try again.' };
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      return { error: friendly, errorDetail: detail };
     }
   }, []);
 
   const register = useCallback(async (email: string, password: string, displayName?: string) => {
+    const friendly = 'Something went wrong. Please try again.';
     try {
       const res = await authFetch('/api/auth/register', {
         method: 'POST',
@@ -113,7 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         data = await res.json();
       } catch {
-        return { error: 'Something went wrong. Please try again.' };
+        const detail = `Server returned invalid response (status ${res.status}). Is the backend running at ${process.env.NEXT_PUBLIC_API_URL || 'NEXT_PUBLIC_API_URL'}?`;
+        return { error: friendly, errorDetail: detail };
       }
       if (!res.ok) return { error: data.error || 'Registration failed' };
       const token = (data as { token?: string }).token;
@@ -121,8 +126,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(data.user as User);
       setSessionStorageSession();
       return {};
-    } catch {
-      return { error: 'Something went wrong. Please try again.' };
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      return { error: friendly, errorDetail: detail };
     }
   }, []);
 

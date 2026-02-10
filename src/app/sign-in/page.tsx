@@ -17,6 +17,8 @@ function SignInContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [errorDetail, setErrorDetail] = useState('');
+  const [showDetail, setShowDetail] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const { login, user } = useAuth();
@@ -37,11 +39,14 @@ function SignInContent() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setErrorDetail('');
+    setShowDetail(false);
     setSubmitting(true);
     try {
-      const { error: err } = await login(email, password);
+      const { error: err, errorDetail: detail } = await login(email, password);
       if (err) {
         setError(err);
+        if (detail) setErrorDetail(detail);
         return;
       }
       setShowSuccess(true);
@@ -80,7 +85,23 @@ function SignInContent() {
       )}
       <h1 className="text-2xl font-bold mb-6">sign in</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {error && (
+          <div className="text-red-600 text-sm">
+            <p>{error}</p>
+            {errorDetail && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowDetail((d) => !d)}
+                  className="mt-1 text-red-600/90 underline underline-offset-2 hover:no-underline focus:outline-none focus:ring-2 focus:ring-red-500/50 rounded"
+                >
+                  {showDetail ? 'Hide details' : 'Get more information'}
+                </button>
+                {showDetail && <p className="mt-1 text-xs text-red-600/80 font-mono break-all">{errorDetail}</p>}
+              </>
+            )}
+          </div>
+        )}
         <div>
           <label htmlFor="email" className="block text-sm font-medium mb-1">email</label>
           <input
