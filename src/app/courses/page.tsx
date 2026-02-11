@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { authFetch } from '@/lib/authClient';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 
 type Institution = {
   id: number;
@@ -100,6 +101,13 @@ export default function CoursesPage() {
   const [deletingCourseId, setDeletingCourseId] = useState<number | null>(null);
   const [deleteConfirmCourse, setDeleteConfirmCourse] = useState<Course | null>(null);
   const [deleteCourseError, setDeleteCourseError] = useState('');
+  const [formulaDropdownOpen, setFormulaDropdownOpen] = useState(false);
+  const formulaDropdownRef = useRef<HTMLDivElement>(null);
+  const [removingFormulaKey, setRemovingFormulaKey] = useState<string | null>(null);
+  const [editingSegmentKey, setEditingSegmentKey] = useState<string | null>(null);
+  const [editSegmentType, setEditSegmentType] = useState<SegmentType | ''>('');
+  const [editSegmentLabel, setEditSegmentLabel] = useState('');
+  const [updatingSegmentKey, setUpdatingSegmentKey] = useState<string | null>(null);
 
   const filteredCourseFormulas = courseFormulas.filter((cf) => {
     if (filterSegmentType && (cf.segment_type || '') !== filterSegmentType) return false;
@@ -252,6 +260,18 @@ export default function CoursesPage() {
     if (user && courses.length > 0) fetchAllCourseFormulas();
   }, [user, courses.length]);
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (formulaDropdownRef.current && !formulaDropdownRef.current.contains(e.target as Node)) {
+        setFormulaDropdownOpen(false);
+      }
+    }
+    if (formulaDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [formulaDropdownOpen]);
+
   async function handleAddFormulaToCourse(e: React.FormEvent) {
     e.preventDefault();
     setAddFormulaError('');
@@ -298,6 +318,73 @@ export default function CoursesPage() {
     if (cf.segment_type) return cf.segment_type;
     if (cf.segment_label) return cf.segment_label;
     return '';
+  }
+
+  async function removeFormulaFromCourse(courseId: number, formulaId: number) {
+    const key = `${courseId}-${formulaId}`;
+    setRemovingFormulaKey(key);
+    setAddFormulaError('');
+    try {
+      const res = await authFetch(`/api/courses/${courseId}/formulas/${formulaId}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setAddFormulaError((data as { error?: string }).error || 'Failed to remove formula.');
+        return;
+      }
+      if (selectedCourseIdForFormula === courseId) {
+        setCourseFormulas((prev) => prev.filter((f) => f.id !== formulaId));
+      }
+      fetchAllCourseFormulas();
+    } finally {
+      setRemovingFormulaKey(null);
+    }
+  }
+
+  function startEditSegment(courseId: number, formulaId: number, segmentType: string | null, segmentLabel: string | null) {
+    const key = `${courseId}-${formulaId}`;
+    setEditingSegmentKey(key);
+    setEditSegmentType((segmentType && SEGMENT_TYPES.includes(segmentType as SegmentType)) ? (segmentType as SegmentType) : '');
+    setEditSegmentLabel(segmentLabel || '');
+  }
+
+  function cancelEditSegment() {
+    setEditingSegmentKey(null);
+    setEditSegmentType('');
+    setEditSegmentLabel('');
+  }
+
+  async function saveSegmentEdit(courseId: number, formulaId: number) {
+    const key = `${courseId}-${formulaId}`;
+    setUpdatingSegmentKey(key);
+    setAddFormulaError('');
+    try {
+      const res = await authFetch(`/api/courses/${courseId}/formulas/${formulaId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          segment_type: editSegmentType || undefined,
+          segment_label: editSegmentLabel.trim() || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setAddFormulaError((data as { error?: string }).error || 'Failed to update segment.');
+        return;
+      }
+      cancelEditSegment();
+      if (selectedCourseIdForFormula === courseId) {
+        setCourseFormulas((prev) =>
+          prev.map((f) =>
+            f.id === formulaId
+              ? { ...f, segment_type: editSegmentType || null, segment_label: editSegmentLabel.trim() || null }
+              : f
+          )
+        );
+      }
+      fetchAllCourseFormulas();
+    } finally {
+      setUpdatingSegmentKey(null);
+    }
   }
 
   function openAddCourse() {
@@ -494,6 +581,7 @@ export default function CoursesPage() {
   }
 
   return (
+    <MathJaxContext>
     <div className="text-nav">
       {deleteConfirmCourse && (() => {
         const c = deleteConfirmCourse;
@@ -836,22 +924,63 @@ export default function CoursesPage() {
                 {formulasLoading ? (
                   <p className="text-sm text-gray-500 dark:text-zinc-400">loading formulas…</p>
                 ) : (
-                  <select
-                    id="formula-select"
-                    value={selectedFormulaId ?? ''}
-                    onChange={(e) => setSelectedFormulaId(e.target.value ? Number(e.target.value) : null)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
-                  >
-                    <option value="">— Select a formula —</option>
-                    {allFormulas
-                      .filter((f) => !courseFormulas.some((cf) => cf.id === f.id))
-                      .map((f) => (
-                        <option key={f.id} value={f.id}>
-                          {f.formula_name}
-                          {f.latex ? ` — ${f.latex}` : ''}
-                        </option>
-                      ))}
-                  </select>
+                  <div ref={formulaDropdownRef} className="relative">
+                    <button
+                      type="button"
+                      id="formula-select"
+                      onClick={() => setFormulaDropdownOpen((o) => !o)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200 text-left flex items-center justify-between"
+                    >
+                      <span>
+                        {selectedFormulaId != null
+                          ? (() => {
+                              const f = allFormulas.find((x) => x.id === selectedFormulaId);
+                              return f ? f.formula_name : '— Select a formula —';
+                            })()
+                          : '— Select a formula —'}
+                      </span>
+                      <span className="text-gray-500">▾</span>
+                    </button>
+                    {formulaDropdownOpen && (
+                      <ul
+                        className="absolute z-50 mt-1 w-full max-h-64 overflow-y-auto border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 shadow-lg"
+                        role="listbox"
+                      >
+                        <li
+                          role="option"
+                          aria-selected={selectedFormulaId == null}
+                          onClick={() => {
+                            setSelectedFormulaId(null);
+                            setFormulaDropdownOpen(false);
+                          }}
+                          className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-b border-gray-100 dark:border-zinc-700"
+                        >
+                          — Select a formula —
+                        </li>
+                        {allFormulas
+                          .filter((f) => !courseFormulas.some((cf) => cf.id === f.id))
+                          .map((f) => (
+                            <li
+                              key={f.id}
+                              role="option"
+                              aria-selected={selectedFormulaId === f.id}
+                              onClick={() => {
+                                setSelectedFormulaId(f.id);
+                                setFormulaDropdownOpen(false);
+                              }}
+                              className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 border-b border-gray-100 dark:border-zinc-700 last:border-b-0 flex items-center gap-2 flex-wrap"
+                            >
+                              <span className="font-medium">{f.formula_name}</span>
+                              {f.latex && (
+                                <span className="text-gray-500 dark:text-zinc-400 overflow-x-auto">
+                                  <MathJax>{`\\(${f.latex}\\)`}</MathJax>
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                      </ul>
+                    )}
+                  </div>
                 )}
                 {courseFormulasLoading && (
                   <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">loading course formulas…</p>
@@ -899,17 +1028,94 @@ export default function CoursesPage() {
                         <ul className="space-y-2 max-h-48 overflow-y-auto">
                           {filteredCourseFormulas.map((cf) => {
                             const seg = formatSegment(cf);
+                            const key = `${selectedCourseIdForFormula}-${cf.id}`;
+                            const removing = removingFormulaKey === key;
+                            const editing = editingSegmentKey === key;
+                            const updating = updatingSegmentKey === key;
                             return (
                               <li
                                 key={cf.id}
                                 className="py-2 px-3 rounded border border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-sm"
                               >
-                                <span className="font-medium">{cf.formula_name}</span>
-                                {cf.latex && <span className="text-gray-500 dark:text-zinc-400 ml-2">{cf.latex}</span>}
-                                {seg && (
-                                  <span className="ml-2 px-1.5 py-0.5 rounded bg-[#6b7c3d]/15 text-[#6b7c3d] text-xs">
-                                    {seg}
-                                  </span>
+                                {editing ? (
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="font-medium">{cf.formula_name}</span>
+                                      {cf.latex && (
+                                        <span className="text-gray-500 dark:text-zinc-400 inline">
+                                          <MathJax>{`\\(${cf.latex}\\)`}</MathJax>
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="flex flex-wrap gap-2 items-center">
+                                      <select
+                                        value={editSegmentType}
+                                        onChange={(e) => setEditSegmentType((e.target.value || '') as SegmentType | '')}
+                                        className="px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
+                                      >
+                                        <option value="">No segment</option>
+                                        {SEGMENT_TYPES.map((t) => (
+                                          <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                                        ))}
+                                      </select>
+                                      <input
+                                        type="text"
+                                        placeholder="Segment label"
+                                        value={editSegmentLabel}
+                                        onChange={(e) => setEditSegmentLabel(e.target.value)}
+                                        className="px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200 w-32"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => selectedCourseIdForFormula != null && saveSegmentEdit(selectedCourseIdForFormula, cf.id)}
+                                        disabled={updating}
+                                        className="text-xs text-[#6b7c3d] hover:underline disabled:opacity-50"
+                                      >
+                                        {updating ? 'Saving…' : 'Save'}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={cancelEditSegment}
+                                        disabled={updating}
+                                        className="text-xs text-gray-500 hover:underline disabled:opacity-50"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                                    <span className="flex items-center gap-2 flex-wrap">
+                                      <span className="font-medium">{cf.formula_name}</span>
+                                      {cf.latex && (
+                                        <span className="text-gray-500 dark:text-zinc-400 inline">
+                                          <MathJax>{`\\(${cf.latex}\\)`}</MathJax>
+                                        </span>
+                                      )}
+                                      {seg && (
+                                        <span className="px-1.5 py-0.5 rounded bg-[#6b7c3d]/15 text-[#6b7c3d] text-xs">
+                                          {seg}
+                                        </span>
+                                      )}
+                                    </span>
+                                    <span className="flex items-center gap-4">
+                                      <button
+                                        type="button"
+                                        onClick={() => startEditSegment(selectedCourseIdForFormula!, cf.id, cf.segment_type, cf.segment_label)}
+                                        className="text-xs text-[#6b7c3d] hover:underline"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => selectedCourseIdForFormula != null && removeFormulaFromCourse(selectedCourseIdForFormula, cf.id)}
+                                        disabled={removing}
+                                        className="text-xs text-red-600 dark:text-red-400 hover:underline disabled:opacity-50"
+                                      >
+                                        {removing ? 'Removing…' : 'Remove'}
+                                      </button>
+                                    </span>
+                                  </div>
                                 )}
                               </li>
                             );
@@ -1049,6 +1255,7 @@ export default function CoursesPage() {
                         Segment label {tableSortBy === 'segment_label' ? (tableSortDir === 'asc' ? '↑' : '↓') : ''}
                       </button>
                     </th>
+                    <th className="p-2 min-w-[100px]"></th>
                   </tr>
                   <tr className="bg-gray-50 dark:bg-zinc-800/80 border-b border-gray-200 dark:border-zinc-600">
                     <th className="p-1.5">
@@ -1098,36 +1305,112 @@ export default function CoursesPage() {
                         ))}
                       </select>
                     </th>
+                    <th className="p-1.5"></th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-zinc-900">
                   {filteredTableRows.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="p-4 text-center text-gray-500 dark:text-zinc-400">
+                      <td colSpan={5} className="p-4 text-center text-gray-500 dark:text-zinc-400">
                         {allCourseFormulaRows.length === 0
                           ? 'No formulas in any course yet. Add some above.'
                           : 'No rows match the current filters.'}
                       </td>
                     </tr>
                   ) : (
-                    filteredTableRows.map((row) => (
-                      <tr
-                        key={`${row.course_id}-${row.formula_id}`}
-                        className="border-b border-gray-100 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
-                      >
-                        <td className="p-2">
-                          <span className="font-medium">{row.formula_name}</span>
-                          {row.latex && <span className="text-gray-500 dark:text-zinc-400 ml-1 text-xs">{row.latex}</span>}
-                        </td>
-                        <td className="p-2 text-gray-700 dark:text-zinc-300">
-                          {row.course_code || row.course_name || '—'}
-                        </td>
-                        <td className="p-2 text-gray-600 dark:text-zinc-400">
-                          {row.segment_type ? row.segment_type.charAt(0).toUpperCase() + row.segment_type.slice(1) : '—'}
-                        </td>
-                        <td className="p-2 text-gray-600 dark:text-zinc-400">{row.segment_label || '—'}</td>
-                      </tr>
-                    ))
+                    filteredTableRows.map((row) => {
+                      const rowKey = `${row.course_id}-${row.formula_id}`;
+                      const editing = editingSegmentKey === rowKey;
+                      const updating = updatingSegmentKey === rowKey;
+                      const removing = removingFormulaKey === rowKey;
+                      return (
+                        <tr
+                          key={rowKey}
+                          className="border-b border-gray-100 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
+                        >
+                          <td className="p-2">
+                            <span className="font-medium">{row.formula_name}</span>
+                            {row.latex && (
+                              <span className="text-gray-500 dark:text-zinc-400 ml-1 text-xs inline">
+                                <MathJax>{`\\(${row.latex}\\)`}</MathJax>
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-2 text-gray-700 dark:text-zinc-300">
+                            {row.course_code || row.course_name || '—'}
+                          </td>
+                          <td className="p-2 text-gray-600 dark:text-zinc-400">
+                            {editing ? (
+                              <select
+                                value={editSegmentType}
+                                onChange={(e) => setEditSegmentType((e.target.value || '') as SegmentType | '')}
+                                className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
+                              >
+                                <option value="">—</option>
+                                {SEGMENT_TYPES.map((t) => (
+                                  <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              row.segment_type ? row.segment_type.charAt(0).toUpperCase() + row.segment_type.slice(1) : '—'
+                            )}
+                          </td>
+                          <td className="p-2 text-gray-600 dark:text-zinc-400">
+                            {editing ? (
+                              <input
+                                type="text"
+                                placeholder="Label"
+                                value={editSegmentLabel}
+                                onChange={(e) => setEditSegmentLabel(e.target.value)}
+                                className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
+                              />
+                            ) : (
+                              row.segment_label || '—'
+                            )}
+                          </td>
+                          <td className="p-2">
+                            {editing ? (
+                              <span className="flex flex-wrap gap-4">
+                                <button
+                                  type="button"
+                                  onClick={() => saveSegmentEdit(row.course_id, row.formula_id)}
+                                  disabled={updating}
+                                  className="text-xs text-[#6b7c3d] hover:underline disabled:opacity-50"
+                                >
+                                  {updating ? 'Saving…' : 'Save'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelEditSegment}
+                                  disabled={updating}
+                                  className="text-xs text-gray-500 hover:underline disabled:opacity-50"
+                                >
+                                  Cancel
+                                </button>
+                              </span>
+                            ) : (
+                              <span className="flex flex-wrap gap-4">
+                                <button
+                                  type="button"
+                                  onClick={() => startEditSegment(row.course_id, row.formula_id, row.segment_type, row.segment_label)}
+                                  className="text-xs text-[#6b7c3d] hover:underline"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => removeFormulaFromCourse(row.course_id, row.formula_id)}
+                                  disabled={removing}
+                                  className="text-xs text-red-600 dark:text-red-400 hover:underline disabled:opacity-50"
+                                >
+                                  {removing ? 'Removing…' : 'Remove'}
+                                </button>
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -1142,5 +1425,6 @@ export default function CoursesPage() {
         </section>
       )}
     </div>
+    </MathJaxContext>
   );
 }
