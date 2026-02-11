@@ -1101,7 +1101,7 @@ export default function CoursesPage() {
                                     <span className="flex items-center gap-4">
                                       <button
                                         type="button"
-                                        onClick={() => startEditSegment(selectedCourseIdForFormula!, cf.id, cf.segment_type, cf.segment_label)}
+                                        onClick={() => startEditSegment(selectedCourseIdForFormula!, cf.id, cf.segment_type ?? null, cf.segment_label ?? null)}
                                         className="text-xs text-[#6b7c3d] hover:underline"
                                       >
                                         Edit
