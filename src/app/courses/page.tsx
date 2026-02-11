@@ -92,6 +92,13 @@ export default function CoursesPage() {
   const [tableFilterSegmentLabel, setTableFilterSegmentLabel] = useState('');
   const [tableSortBy, setTableSortBy] = useState<TableSortKey>('course');
   const [tableSortDir, setTableSortDir] = useState<'asc' | 'desc'>('asc');
+  const [editingCourseId, setEditingCourseId] = useState<number | null>(null);
+  const [editCourseName, setEditCourseName] = useState('');
+  const [editCourseCode, setEditCourseCode] = useState('');
+  const [editCourseError, setEditCourseError] = useState('');
+  const [editCourseSubmitting, setEditCourseSubmitting] = useState(false);
+  const [deletingCourseId, setDeletingCourseId] = useState<number | null>(null);
+  const [deleteConfirmCourse, setDeleteConfirmCourse] = useState<Course | null>(null);
 
   const filteredCourseFormulas = courseFormulas.filter((cf) => {
     if (filterSegmentType && (cf.segment_type || '') !== filterSegmentType) return false;
@@ -311,11 +318,90 @@ export default function CoursesPage() {
     setShowAddCourse(false);
     setStep(1);
     setShowAddInstitutionForm(false);
+    refetchCourses();
+  }
+
+  function refetchCourses() {
     setCoursesLoading(true);
     authFetch('/api/courses')
       .then((res) => res.json())
-      .then((data: { courses?: Course[] }) => setCourses(data.courses || []))
+      .then((data: { courses?: Course[]; error?: string }) => {
+        if (data.error) setCoursesError(data.error);
+        else setCourses(data.courses || []);
+      })
+      .catch(() => setCoursesError('Failed to load courses.'))
       .finally(() => setCoursesLoading(false));
+    if (user) fetchAllCourseFormulas();
+  }
+
+  function startEdit(c: Course) {
+    setEditingCourseId(c.course_id);
+    setEditCourseName(c.course_name);
+    setEditCourseCode(c.course_code || '');
+    setEditCourseError('');
+  }
+
+  function cancelEdit() {
+    setEditingCourseId(null);
+    setEditCourseName('');
+    setEditCourseCode('');
+    setEditCourseError('');
+  }
+
+  async function saveEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (editingCourseId == null) return;
+    setEditCourseError('');
+    setEditCourseSubmitting(true);
+    try {
+      const res = await authFetch(`/api/courses/${editingCourseId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          course_name: editCourseName.trim(),
+          course_code: editCourseCode.trim() || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setEditCourseError((data as { error?: string }).error || 'Failed to update course.');
+        return;
+      }
+      cancelEdit();
+      refetchCourses();
+    } finally {
+      setEditCourseSubmitting(false);
+    }
+  }
+
+  function openDeleteConfirm(c: Course) {
+    setDeleteConfirmCourse(c);
+  }
+
+  function closeDeleteConfirm() {
+    setDeleteConfirmCourse(null);
+  }
+
+  async function confirmDeleteCourse() {
+    const c = deleteConfirmCourse;
+    if (!c) return;
+    setDeleteConfirmCourse(null);
+    setDeletingCourseId(c.course_id);
+    try {
+      const res = await authFetch(`/api/courses/${c.course_id}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert((data as { error?: string }).error || 'Failed to remove course.');
+        return;
+      }
+      refetchCourses();
+      if (selectedCourseIdForFormula === c.course_id) {
+        setSelectedCourseIdForFormula(null);
+        setCourseFormulas([]);
+      }
+    } finally {
+      setDeletingCourseId(null);
+    }
   }
 
   async function handleAddInstitution(e: React.FormEvent) {
@@ -402,6 +488,34 @@ export default function CoursesPage() {
 
   return (
     <div className="text-nav">
+      {deleteConfirmCourse && (() => {
+        const c = deleteConfirmCourse;
+        const linkedCount = allCourseFormulaRows.filter((r) => r.course_id === c.course_id).length;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-title">
+            <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-gray-200 dark:border-zinc-600 max-w-md w-full p-6 text-base">
+              <h2 id="delete-confirm-title" className="sr-only">Remove course</h2>
+              {linkedCount > 0 ? (
+                <>
+                  <p className="mb-2">There {linkedCount === 1 ? 'is' : 'are'} {linkedCount} formula{linkedCount !== 1 ? 's' : ''} linked to this course.</p>
+                  <div className="h-4" />
+                  <p className="mb-2">Removing the course will cancel those links. The formulas themselves will remain in the formula library.</p>
+                  <div className="h-4" />
+                </>
+              ) : null}
+              <p className="mb-6">Remove {c.course_name}{c.course_code ? ` (${c.course_code})` : ''} from your courses?</p>
+              <div className="flex gap-3 justify-end">
+                <button type="button" onClick={closeDeleteConfirm} className="px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded hover:bg-gray-100 dark:hover:bg-zinc-700 text-nav">
+                  Cancel
+                </button>
+                <button type="button" onClick={confirmDeleteCourse} disabled={deletingCourseId === c.course_id} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded disabled:opacity-50">
+                  {deletingCourseId === c.course_id ? 'Removing…' : 'Remove'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       <div className="max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-6">my courses</h1>
       <p className="text-sm text-gray-600 dark:text-zinc-400 mb-4">
@@ -422,13 +536,68 @@ export default function CoursesPage() {
         <ul className="space-y-2 mb-6">
           {courses.map((c) => (
             <li key={c.course_id} className="py-2 px-3 rounded border border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-900">
-              <span className="font-medium">{c.course_name}</span>
-              {c.course_code && <span className="text-gray-500 dark:text-zinc-400 ml-2">({c.course_code})</span>}
-              {c.institution_name && (
-                <span className="block text-sm text-gray-600 dark:text-zinc-400">{c.institution_name}</span>
-              )}
-              {c.course_type === 'personal' && (
-                <span className="block text-sm text-gray-600 dark:text-zinc-400">Personal project</span>
+              {editingCourseId === c.course_id ? (
+                <form onSubmit={saveEdit} className="space-y-2">
+                  {editCourseError && <p className="text-red-600 text-sm">{editCourseError}</p>}
+                  <div>
+                    <label htmlFor={`edit-name-${c.course_id}`} className="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-0.5">Course name</label>
+                    <input
+                      id={`edit-name-${c.course_id}`}
+                      type="text"
+                      value={editCourseName}
+                      onChange={(e) => setEditCourseName(e.target.value)}
+                      required
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor={`edit-code-${c.course_id}`} className="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-0.5">Course code (optional)</label>
+                    <input
+                      id={`edit-code-${c.course_id}`}
+                      type="text"
+                      value={editCourseCode}
+                      onChange={(e) => setEditCourseCode(e.target.value)}
+                      placeholder="e.g. STAT 352"
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
+                    />
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <button type="submit" disabled={editCourseSubmitting} className="py-1.5 px-3 text-sm bg-[#6b7c3d] hover:bg-[#7a8f4a] text-white rounded disabled:opacity-50">
+                      {editCourseSubmitting ? 'Saving…' : 'Save'}
+                    </button>
+                    <button type="button" onClick={cancelEdit} className="py-1.5 px-3 text-sm border border-gray-300 dark:border-zinc-600 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-nav">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <span className="font-medium">{c.course_name}</span>
+                  {c.course_code && <span className="text-gray-500 dark:text-zinc-400 ml-2">({c.course_code})</span>}
+                  {c.institution_name && (
+                    <span className="block text-sm text-gray-600 dark:text-zinc-400">{c.institution_name}</span>
+                  )}
+                  {c.course_type === 'personal' && (
+                    <span className="block text-sm text-gray-600 dark:text-zinc-400">Personal project</span>
+                  )}
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => startEdit(c)}
+                      className="text-sm text-[#6b7c3d] hover:underline"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDeleteConfirm(c)}
+                      disabled={deletingCourseId === c.course_id}
+                      className="text-sm text-red-600 hover:underline disabled:opacity-50"
+                    >
+                      {deletingCourseId === c.course_id ? 'Removing…' : 'Delete'}
+                    </button>
+                  </div>
+                </>
               )}
             </li>
           ))}

@@ -38,12 +38,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refetch = useCallback(async () => {
     try {
-      // No sessionStorage and no stored JWT = no "session" (e.g. user closed all tabs). Treat as logged out.
-      const hasStoredToken = !!getStoredToken();
-      if (!hasSessionStorageSession() && !hasStoredToken) {
-        await authFetch('/api/auth/logout', { method: 'POST' });
+      // sessionStorage is cleared when the tab/window is closed. If there's no sessionStorage key,
+      // treat as "last tab was closed" and log out (clear any leftover JWT) so a new tab doesn't restore the session.
+      if (!hasSessionStorageSession()) {
         clearStoredToken();
         setUser(null);
+        await authFetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
         setLoading(false);
         return;
       }
