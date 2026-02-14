@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { AccessibilityProvider } from "@/context/AccessibilityContext";
 import { NavigationProvider } from "@/context/NavigationContext";
 import LayoutWrapper from "./components/LayoutWrapper";
 
@@ -31,11 +32,13 @@ export default function RootLayout({
       <body className="antialiased tracking-tight">
         <div className="min-h-screen flex flex-col justify-between pt-0 md:pt-8 p-8 dark:bg-zinc-950 bg-white text-gray-900 dark:text-zinc-200">
           <AuthProvider>
-            <NavigationProvider>
-              <LayoutWrapper>
-                {children}
-              </LayoutWrapper>
-            </NavigationProvider>
+            <AccessibilityProvider>
+              <NavigationProvider>
+                <LayoutWrapper>
+                  {children}
+                </LayoutWrapper>
+              </NavigationProvider>
+            </AccessibilityProvider>
           </AuthProvider>
           <Footer />
         </div>

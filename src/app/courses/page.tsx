@@ -612,7 +612,7 @@ export default function CoursesPage() {
           </div>
         );
       })()}
-      <div className="max-w-md mx-auto">
+      <div className="max-w-6xl mx-auto px-4 w-full">
       <h1 className="text-2xl font-bold mb-6">my courses</h1>
       <p className="text-sm text-gray-600 dark:text-zinc-400 mb-4">
         Add courses or personal learning projects, then link formulas to them.

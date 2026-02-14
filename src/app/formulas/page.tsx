@@ -84,6 +84,7 @@ function FormulasContent() {
   const [includeChildren, setIncludeChildren] = useState(getInitialIncludeChildren());
   const [isInitialMount, setIsInitialMount] = useState(true);
   const [keyboardHintVisible, setKeyboardHintVisible] = useState(false);
+  const [tableFilterFormula, setTableFilterFormula] = useState('');
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -281,16 +282,23 @@ function FormulasContent() {
     return childDisciplines.filter(d => d.parent_id === parentId);
   };
 
+  // Filter formulas by table search
+  const filteredFormulas = (() => {
+    const q = (tableFilterFormula || '').trim().toLowerCase();
+    if (!q) return formulas;
+    return formulas.filter(
+      (f) =>
+        (f.formula_name || '').toLowerCase().includes(q) ||
+        (f.latex || '').toLowerCase().includes(q)
+    );
+  })();
+
   return (
     <MathJaxContext>
       <div>
         {/* Page title */}
-        <h1 style={{
-          marginBottom: '20px',
-          fontSize: '32px',
-          fontWeight: 'bold'
-        }}>
-          Lingua Formula
+        <h1 className="text-2xl font-bold mb-6 text-nav">
+          formula list
         </h1>
 
         {/* Discipline Filter Section */}
@@ -451,14 +459,6 @@ function FormulasContent() {
           </div>
         )}
 
-        {/* Results Count */}
-        {!loading && !error && (
-          <div style={{ marginBottom: '15px', color: '#6b7280', fontSize: '14px' }}>
-            Showing {formulas.length} formula{formulas.length !== 1 ? 's' : ''}
-            {selectedDisciplines.size > 0 && ` (filtered)`}
-          </div>
-        )}
-
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="bouncing-dots" aria-hidden>
@@ -475,75 +475,106 @@ function FormulasContent() {
             No formulas found. Try adjusting your filters.
           </p>
         ) : (
-          <ul>
-            {formulas.map((formula) => (
-              <li key={formula.id} style={{ marginBottom: '15px', position: 'relative' }}>
-                {/* Conditionally render as hyperlink only if formula_description exists. Revert link color to color: 'blue' if desired. */}
-                {formula.formula_description ? (
-                  <Link 
-                    href={(() => {
-                      const params = new URLSearchParams();
-                      if (selectedDisciplines.size > 0) {
-                        params.set('disciplines', Array.from(selectedDisciplines).join(','));
-                      }
-                      if (!includeChildren) {
-                        params.set('include_children', 'false');
-                      }
-                      const queryString = params.toString();
-                      return `/formula/${formula.id}${queryString ? `?${queryString}` : ''}`;
-                    })()}
-                    style={{ textDecoration: 'underline', color: '#556b2f', cursor: 'pointer' }}
-                    onMouseEnter={() => !isTouchDevice && setHoveredFormula(formula.id)}
-                    onMouseLeave={() => !isTouchDevice && setHoveredFormula(null)}
-                    onTouchStart={() => setHoveredFormula(null)}
-                  >
-                    <strong>{formula.formula_name}</strong>
-                  </Link>
+          <div className="w-full min-w-0 overflow-auto max-h-[70vh] rounded-lg border border-gray-200 dark:border-zinc-600">
+            <table className="w-full max-w-full text-sm border-collapse table-fixed">
+              <thead className="sticky top-0 z-10 bg-gray-100 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-600">
+                <tr>
+                  <th className="text-left p-2 text-black dark:text-white w-[40%] min-w-[200px]" style={{ fontSize: '18px', fontWeight: '600' }}>
+                    Formula Name
+                  </th>
+                  <th className="text-left p-2 text-black dark:text-white w-[60%] min-w-[200px]" style={{ fontSize: '18px', fontWeight: '600' }}>
+                    Formula
+                  </th>
+                </tr>
+                <tr className="bg-gray-50 dark:bg-zinc-800/80 border-b border-gray-200 dark:border-zinc-600">
+                  <th className="p-1.5">
+                    <input
+                      type="text"
+                      placeholder="Filter…"
+                      value={tableFilterFormula}
+                      onChange={(e) => setTableFilterFormula(e.target.value)}
+                      className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200"
+                    />
+                  </th>
+                  <th className="p-1.5"></th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-zinc-900">
+                {filteredFormulas.length === 0 ? (
+                  <tr>
+                    <td colSpan={2} className="p-4 text-center text-gray-500 dark:text-zinc-400">
+                      {formulas.length === 0
+                        ? 'No formulas found.'
+                        : 'No rows match the filter.'}
+                    </td>
+                  </tr>
                 ) : (
-                  <strong>{formula.formula_name}</strong>
+                  filteredFormulas.map((formula) => (
+                    <tr
+                      key={formula.id}
+                      className="border-b border-gray-100 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
+                    >
+                      <td className="p-2 relative">
+                        {formula.formula_description ? (
+                          <Link
+                            href={(() => {
+                              const params = new URLSearchParams();
+                              if (selectedDisciplines.size > 0) {
+                                params.set('disciplines', Array.from(selectedDisciplines).join(','));
+                              }
+                              if (!includeChildren) {
+                                params.set('include_children', 'false');
+                              }
+                              const queryString = params.toString();
+                              return `/formula/${formula.id}${queryString ? `?${queryString}` : ''}`;
+                            })()}
+                            className="text-[#6b7c3d] hover:underline font-semibold text-lg"
+                            onMouseEnter={() => !isTouchDevice && setHoveredFormula(formula.id)}
+                            onMouseLeave={() => !isTouchDevice && setHoveredFormula(null)}
+                            onTouchStart={() => setHoveredFormula(null)}
+                          >
+                            {formula.formula_name}
+                          </Link>
+                        ) : (
+                          <span className="font-semibold text-lg">{formula.formula_name}</span>
+                        )}
+                        {hoveredFormula === formula.id && formula.formula_description && !isTouchDevice && (
+                          <div
+                            className="absolute bg-white dark:bg-zinc-800 p-3 border border-gray-200 dark:border-zinc-600 rounded-lg shadow-lg z-10"
+                            style={{ top: '28px', left: 0, width: '280px' }}
+                          >
+                            <MathJax key={`tooltip-${formula.id}-${renderKey}`}>{formula.formula_description}</MathJax>
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-2 text-gray-600 dark:text-zinc-400">
+                        {formula.latex && !loading && !isRendering && formulasRef.current.length > 0 ? (
+                          <FormulaDisplayErrorBoundary formula={formula}>
+                            <MathJax key={`formula-${formula.id}-${renderKey}`}>
+                              <span className="inline-block max-w-full overflow-x-auto">
+                                {`\\(${formula.latex}\\)`}
+                              </span>
+                            </MathJax>
+                          </FormulaDisplayErrorBoundary>
+                        ) : formula.latex ? (
+                          <span className="text-gray-400 dark:text-zinc-500 italic">Loading…</span>
+                        ) : (
+                          <span className="text-gray-400 dark:text-zinc-500 italic">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
                 )}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-                {/* Tooltip - only shown if formula_description exists and not on touch device */}
-                {hoveredFormula === formula.id && formula.formula_description && !isTouchDevice && (
-                  <div 
-                    style={{
-                      position: "absolute",
-                      background: "white",
-                      padding: "10px",
-                      border: "1px solid gray",
-                      borderRadius: "5px",
-                      boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                      top: "30px",
-                      left: "0",
-                      width: "250px",
-                      zIndex: 10
-                    }}
-                  >
-                    {formula.formula_description && (
-                      <MathJax key={`tooltip-${formula.id}-${renderKey}`}>{formula.formula_description}</MathJax>
-                    )}
-                  </div>
-                )}
-
-                {/* MathJax formula display - only render when stable; boundary avoids crash if typeset fails (e.g. dev Strict Mode) */}
-                {formula.latex && !loading && !isRendering && formulasRef.current.length > 0 ? (
-                  <FormulaDisplayErrorBoundary formula={formula}>
-                    <div key={`formula-wrapper-${formula.id}-${renderKey}`}>
-                      <MathJax key={`formula-${formula.id}-${renderKey}`}>
-                        <span style={{ whiteSpace: 'normal', display: 'inline-block', maxWidth: '80%' }}>
-                          {`\\(${formula.latex}\\)`}
-                        </span>
-                      </MathJax>
-                    </div>
-                  </FormulaDisplayErrorBoundary>
-                ) : formula.latex ? (
-                  <span style={{ color: '#6b7280', fontStyle: 'italic' }}>Loading formula...</span>
-                ) : (
-                  <span style={{ color: '#6b7280', fontStyle: 'italic' }}>No formula available</span>
-                )}
-              </li>
-            ))}
-          </ul>
+        {!loading && !error && formulas.length > 0 && (
+          <p className="mt-2 text-xs text-gray-500 dark:text-zinc-400">
+            Showing {filteredFormulas.length} of {formulas.length} formula{formulas.length !== 1 ? 's' : ''}
+            {(tableFilterFormula || selectedDisciplines.size > 0) && ' (filtered)'}
+          </p>
         )}
       </div>
     </MathJaxContext>

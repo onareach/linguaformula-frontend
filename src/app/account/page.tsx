@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useAccessibility } from '@/context/AccessibilityContext';
 import { PasswordInput } from '@/app/components/PasswordInput';
 
 export default function AccountPage() {
-  const { user, loading, logout, updateProfile } = useAuth();
+  const { user, loading, updateProfile } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -20,6 +21,8 @@ export default function AccountPage() {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [submittingPassword, setSubmittingPassword] = useState(false);
+  const { highContrast, setHighContrast } = useAccessibility();
+  const [showInfoPopover, setShowInfoPopover] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) router.replace('/sign-in');
@@ -33,7 +36,7 @@ export default function AccountPage() {
   }, [user]);
 
   if (loading || !user) {
-    return <div className="max-w-md mx-auto text-nav">loading…</div>;
+    return <div className="p-4 max-w-2xl text-nav">loading…</div>;
   }
 
   async function handleProfileSubmit(e: React.FormEvent) {
@@ -72,13 +75,8 @@ export default function AccountPage() {
     }
   }
 
-  async function handleLogout() {
-    await logout();
-    router.push('/');
-  }
-
   return (
-    <div className="max-w-md mx-auto space-y-8 text-nav">
+    <div className="p-4 max-w-2xl space-y-8 text-nav">
       <h1 className="text-2xl font-bold">account</h1>
 
       <section>
@@ -123,7 +121,7 @@ export default function AccountPage() {
           <button
             type="button"
             onClick={() => setShowChangePassword(true)}
-            className="py-2 px-4 border border-gray-300 dark:border-zinc-600 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-nav"
+            className="py-2 px-4 bg-[#6b7c3d] hover:bg-[#7a8f4a] text-white rounded"
           >
             change password
           </button>
@@ -184,13 +182,47 @@ export default function AccountPage() {
       </section>
 
       <section>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="py-2 px-4 border border-gray-300 dark:border-zinc-600 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-nav"
-        >
-          sign out
-        </button>
+        <h2 className="text-lg font-semibold mb-3">accessibility settings</h2>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <label htmlFor="high-contrast-toggle" className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+              <input
+                id="high-contrast-toggle"
+                type="checkbox"
+                checked={highContrast}
+                onChange={(e) => setHighContrast(e.target.checked)}
+                className="accent-[#6b7c3d]"
+              />
+              <span>use high contrast UI</span>
+            </label>
+            <div className="relative">
+              <button
+                type="button"
+                aria-label="Information about High Contrast UI"
+                aria-describedby="high-contrast-info"
+                onMouseEnter={() => setShowInfoPopover(true)}
+                onMouseLeave={() => setShowInfoPopover(false)}
+                onFocus={() => setShowInfoPopover(true)}
+                onBlur={() => setShowInfoPopover(false)}
+                className="w-5 h-5 rounded-full border border-gray-400 dark:border-zinc-500 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
+              >
+                i
+              </button>
+              {showInfoPopover && (
+                <div
+                  id="high-contrast-info"
+                  role="tooltip"
+                  className="absolute left-0 top-full mt-1 z-20 w-56 p-2 text-sm bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-600 rounded shadow-lg"
+                >
+                  Enhances the color contrast of text, buttons, etc.
+                </div>
+              )}
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-zinc-400">
+            Reload the page or navigate to a new page for this change to take effect.
+          </p>
+        </div>
       </section>
     </div>
   );

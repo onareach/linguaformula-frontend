@@ -184,3 +184,88 @@ h4 {
 .formulas-filter-clear:hover {
   background-color: #7a8f4a;
 }
+
+/* High contrast mode – enhances color contrast of text, buttons, etc. */
+html.high-contrast {
+  --hc-text: #000000;
+  --hc-text-muted: #1a1a1a;
+  --hc-bg: #ffffff;
+  --hc-border: #000000;
+  --hc-link: #0d47a1;
+  --hc-button-bg: #1b5e20;
+  --hc-button-hover: #2e7d32;
+}
+
+@media (prefers-color-scheme: dark) {
+  html.high-contrast {
+    --hc-text: #ffffff;
+    --hc-text-muted: #e0e0e0;
+    --hc-bg: #0a0a0a;
+    --hc-border: #ffffff;
+    --hc-link: #64b5f6;
+    --hc-button-bg: #2e7d32;
+    --hc-button-hover: #43a047;
+  }
+}
+
+html.high-contrast body,
+html.high-contrast [class*="min-h-screen"] {
+  color: var(--hc-text) !important;
+  background-color: var(--hc-bg) !important;
+}
+
+html.high-contrast a,
+html.high-contrast [class*="6b7c3d"],
+html.high-contrast button.text-nav {
+  text-decoration: underline !important;
+}
+
+html.high-contrast a:hover {
+  text-decoration-thickness: 2px !important;
+}
+
+/* Nav links and sign out: same muted color as other nav text */
+html.high-contrast a.text-nav,
+html.high-contrast a.text-copy,
+html.high-contrast button.text-nav {
+  color: var(--hc-text-muted) !important;
+}
+
+/* Other links: blue for visibility */
+html.high-contrast a:not(.text-nav):not(.text-copy):not([class*="6b7c3d"]) {
+  color: var(--hc-link) !important;
+}
+
+/* Formula links and other olive-styled links: dark olive green (matches checkbox filter) */
+html.high-contrast a[class*="6b7c3d"] {
+  color: #556b2f !important;
+}
+
+html.high-contrast .text-nav,
+html.high-contrast .text-copy {
+  color: var(--hc-text-muted) !important;
+}
+
+html.high-contrast input,
+html.high-contrast select,
+html.high-contrast textarea {
+  border-color: var(--hc-border) !important;
+  color: var(--hc-text) !important;
+  background-color: var(--hc-bg) !important;
+}
+
+html.high-contrast button {
+  border-color: var(--hc-border) !important;
+}
+
+html.high-contrast .formulas-filter-clear,
+html.high-contrast button[class*="6b7c3d"] {
+  background-color: var(--hc-button-bg) !important;
+  color: #ffffff !important;
+  border: 2px solid var(--hc-border) !important;
+}
+
+html.high-contrast .formulas-filter-clear:hover,
+html.high-contrast button[class*="6b7c3d"]:hover {
+  background-color: var(--hc-button-hover) !important;
+}

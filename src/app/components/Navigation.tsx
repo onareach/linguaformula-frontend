@@ -20,18 +20,8 @@ function NavLinks({
   return (
     <ul className="space-y-2 text-center md:space-y-2">
       <li className="p-0">
-        <Link className="text-copy" href="/welcome" onClick={onLinkClick} suppressHydrationWarning>
-          welcome
-        </Link>
-      </li>
-      <li className="p-0">
         <Link className="text-nav hover:text-nav-hover" href="/formulas" onClick={onLinkClick}>
           formulas
-        </Link>
-      </li>
-      <li className="p-0">
-        <Link className="text-nav hover:text-nav-hover" href="/" onClick={onLinkClick}>
-          home
         </Link>
       </li>
       <li className="p-0">
@@ -47,6 +37,16 @@ function NavLinks({
             self-testing
           </Link>
         ) : null}
+      </li>
+      <li className="p-0">
+        <Link className="text-copy" href="/welcome" onClick={onLinkClick} suppressHydrationWarning>
+          welcome
+        </Link>
+      </li>
+      <li className="p-0">
+        <Link className="text-nav hover:text-nav-hover" href="/" onClick={onLinkClick}>
+          home
+        </Link>
       </li>
       <li className="p-0">
         {user ? (
@@ -109,7 +109,7 @@ export default function Navigation() {
     <>
       {/* Desktop: sidebar (hidden on small screens) */}
       <nav
-        className="order-2 mt-12 w-full hidden md:block md:mt-0 md:w-1/4"
+        className="order-2 mt-12 w-full hidden md:block md:mt-0 md:w-[10%]"
         aria-label="Main navigation"
         suppressHydrationWarning
       >

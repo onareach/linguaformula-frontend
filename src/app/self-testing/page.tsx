@@ -291,7 +291,7 @@ export default function SelfTestingPage() {
 
   return (
     <div className="p-4 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-4">self-testing</h1>
+      <h1 className="text-2xl font-bold mb-4 text-nav">self-testing</h1>
       <p className="text-gray-600 dark:text-zinc-400 mb-6">
         Test yourself on all formulas linked to a course. Choose a course and optionally filter by segment.
       </p>
