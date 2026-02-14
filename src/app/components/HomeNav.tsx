@@ -22,6 +22,9 @@ export default function HomeNav() {
           <Link className="text-nav hover:text-nav-hover text-lg" href="/courses">
             courses
           </Link>
+          <Link className="text-nav hover:text-nav-hover text-lg" href="/self-testing">
+            self-testing
+          </Link>
           <Link className="text-nav hover:text-nav-hover text-lg" href="/account">
             account
           </Link>

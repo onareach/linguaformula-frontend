@@ -43,6 +43,13 @@ function NavLinks({
       </li>
       <li className="p-0">
         {user ? (
+          <Link className="text-nav hover:text-nav-hover" href="/self-testing" onClick={onLinkClick}>
+            self-testing
+          </Link>
+        ) : null}
+      </li>
+      <li className="p-0">
+        {user ? (
           <Link className="text-nav hover:text-nav-hover" href="/account" onClick={onLinkClick}>
             account
           </Link>
