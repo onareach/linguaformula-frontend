@@ -84,7 +84,7 @@ function TermQuizContent() {
         <p>No questions for this term yet.</p>
         <Link
           href={`/term/${id}`}
-          className="link-olive"
+          className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline"
         >
           ← Back to Term
         </Link>
@@ -208,7 +208,7 @@ function TermQuizContent() {
 
   return (
     <div style={{ padding: "20px", maxWidth: "720px" }}>
-      <Link href={`/term/${id}`} className="link-olive mb-4 inline-block" style={{ background: "transparent", padding: 0 }}>
+      <Link href={`/term/${id}`} className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline mb-4 inline-block" style={{ background: "transparent", padding: 0 }}>
         ← Back to Term
       </Link>
       <h1 style={{ fontSize: "24px", marginBottom: "8px" }}>Quiz</h1>

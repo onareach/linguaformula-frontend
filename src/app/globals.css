@@ -92,16 +92,6 @@ h4 {
   color: rgb(75 85 99); /* gray-600 */
 }
 
-/* Olive links: term/formula detail and quiz pages – override any default link color */
-.link-olive {
-  color: #6b7c3d !important;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.link-olive:hover {
-  text-decoration: underline;
-}
-
 @media (prefers-color-scheme: dark) {
   .text-copy {
     color: rgb(209 213 219); /* gray-300 */
@@ -247,8 +237,7 @@ html.high-contrast a:not(.text-nav):not(.text-copy):not([class*="6b7c3d"]) {
 }
 
 /* Formula links and other olive-styled links: dark olive green (matches checkbox filter) */
-html.high-contrast a[class*="6b7c3d"],
-html.high-contrast a.link-olive {
+html.high-contrast a[class*="6b7c3d"] {
   color: #556b2f !important;
 }
 

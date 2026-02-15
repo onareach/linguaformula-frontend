@@ -85,7 +85,7 @@ function QuizContent() {
         <p>No questions for this formula yet.</p>
         <Link
           href={`/formula/${id}`}
-          className="link-olive"
+          className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline"
         >
           ← Back to Formula
         </Link>
@@ -205,7 +205,7 @@ function QuizContent() {
     <div style={{ padding: "20px", maxWidth: "720px" }}>
       <Link
         href={`/formula/${id}`}
-        className="link-olive mb-4 inline-block"
+        className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline mb-4 inline-block"
       >
         ← Back to Formula
       </Link>

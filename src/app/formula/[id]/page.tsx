@@ -91,7 +91,7 @@ function FormulaPageContent() {
     <div style={{ padding: "20px" }}>
       <Link
         href={getBackLink()}
-        className="link-olive inline-block mb-4"
+        className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline inline-block mb-4"
       >
         ← Back to Formula List
       </Link>
@@ -106,7 +106,7 @@ function FormulaPageContent() {
       <p style={{ marginBottom: '16px' }}>
         <Link
           href={`/formula/${id}/quiz`}
-          className="link-olive font-medium"
+          className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline font-medium"
         >
           Quiz Me!
         </Link>
@@ -181,7 +181,7 @@ function FormulaPageContent() {
                         href="/si"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="link-olive"
+                        className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline"
                       >
                         SI
                       </Link>
@@ -229,7 +229,7 @@ function FormulaPageContent() {
         </MathJaxContext>
       <Link
         href={getBackLink()}
-        className="link-olive"
+        className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline"
       >
         ← Back to Formula List
       </Link>
