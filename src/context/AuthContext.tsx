@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authFetch, setStoredToken, clearStoredToken, getStoredToken } from '@/lib/authClient';
 
-export type User = { id: number; email: string; display_name: string | null };
+export type User = { id: number; email: string; display_name: string | null; is_admin?: boolean };
 
 type AuthContextType = {
   user: User | null;

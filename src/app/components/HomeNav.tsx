@@ -25,6 +25,11 @@ export default function HomeNav() {
           <Link className="text-nav hover:text-nav-hover text-lg" href="/self-testing">
             self-testing
           </Link>
+          {user?.is_admin && (
+            <Link className="text-nav hover:text-nav-hover text-lg" href="/admin">
+              admin
+            </Link>
+          )}
           <Link className="text-nav hover:text-nav-hover text-lg" href="/account">
             account
           </Link>

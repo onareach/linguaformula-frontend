@@ -54,6 +54,13 @@ function NavLinks({
         </Link>
       </li>
       <li className="p-0">
+        {user?.is_admin ? (
+          <Link className="text-nav hover:text-nav-hover" href="/admin" onClick={onLinkClick}>
+            admin
+          </Link>
+        ) : null}
+      </li>
+      <li className="p-0">
         {user ? (
           <Link className="text-nav hover:text-nav-hover" href="/account" onClick={onLinkClick}>
             account
