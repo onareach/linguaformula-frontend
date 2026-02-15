@@ -20,6 +20,11 @@ function NavLinks({
   return (
     <ul className="space-y-2 text-center md:space-y-2">
       <li className="p-0">
+        <Link className="text-nav hover:text-nav-hover" href="/terms" onClick={onLinkClick}>
+          terms
+        </Link>
+      </li>
+      <li className="p-0">
         <Link className="text-nav hover:text-nav-hover" href="/formulas" onClick={onLinkClick}>
           formulas
         </Link>

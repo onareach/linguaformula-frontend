@@ -19,6 +19,9 @@ export default function Home() {
         <Link className="text-copy hover:text-nav-hover text-lg" href="/welcome">
           welcome
         </Link>
+        <Link className="text-nav hover:text-nav-hover text-lg" href="/terms">
+          terms
+        </Link>
         <Link className="text-nav hover:text-nav-hover text-lg" href="/formulas">
           formulas
         </Link>
