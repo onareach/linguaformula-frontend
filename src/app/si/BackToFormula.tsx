@@ -14,12 +14,7 @@ export default function BackToFormula() {
     <a
       href="#"
       onClick={handleClick}
-      style={{
-        textDecoration: "underline",
-        color: "#556b2f",
-        cursor: "pointer",
-        display: "inline-block",
-      }}
+      className="link-olive inline-block"
     >
       ← Back to Formula
     </a>

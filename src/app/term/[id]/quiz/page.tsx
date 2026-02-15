@@ -84,7 +84,7 @@ function TermQuizContent() {
         <p>No questions for this term yet.</p>
         <Link
           href={`/term/${id}`}
-          style={{ color: "#556b2f", textDecoration: "underline" }}
+          className="link-olive"
         >
           ← Back to Term
         </Link>
@@ -206,19 +206,9 @@ function TermQuizContent() {
     fontWeight: 500,
   };
 
-  const backLinkStyle = {
-    ...buttonStyle,
-    background: "transparent",
-    color: "#556b2f",
-    padding: 0,
-    textDecoration: "underline",
-    marginBottom: "16px",
-    display: "inline-block",
-  };
-
   return (
     <div style={{ padding: "20px", maxWidth: "720px" }}>
-      <Link href={`/term/${id}`} style={backLinkStyle}>
+      <Link href={`/term/${id}`} className="link-olive mb-4 inline-block" style={{ background: "transparent", padding: 0 }}>
         ← Back to Term
       </Link>
       <h1 style={{ fontSize: "24px", marginBottom: "8px" }}>Quiz</h1>

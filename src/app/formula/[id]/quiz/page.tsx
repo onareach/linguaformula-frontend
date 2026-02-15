@@ -85,7 +85,7 @@ function QuizContent() {
         <p>No questions for this formula yet.</p>
         <Link
           href={`/formula/${id}`}
-          style={{ color: "#556b2f", textDecoration: "underline" }}
+          className="link-olive"
         >
           ← Back to Formula
         </Link>
@@ -201,21 +201,11 @@ function QuizContent() {
     fontWeight: 500,
   };
 
-  const backLinkStyle = {
-    ...buttonStyle,
-    background: "transparent",
-    color: "#556b2f",
-    padding: 0,
-    textDecoration: "underline",
-    marginBottom: "16px",
-    display: "inline-block",
-  };
-
   return (
     <div style={{ padding: "20px", maxWidth: "720px" }}>
       <Link
         href={`/formula/${id}`}
-        style={backLinkStyle}
+        className="link-olive mb-4 inline-block"
       >
         ← Back to Formula
       </Link>

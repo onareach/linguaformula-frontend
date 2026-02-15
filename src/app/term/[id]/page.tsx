@@ -70,13 +70,7 @@ function TermPageContent() {
     <div style={{ padding: "20px" }}>
       <Link
         href={getBackLink()}
-        style={{
-          textDecoration: "underline",
-          color: "#556b2f",
-          cursor: "pointer",
-          display: "inline-block",
-          marginBottom: "16px",
-        }}
+        className="link-olive inline-block mb-4"
       >
         ← Back to Term List
       </Link>
@@ -93,7 +87,7 @@ function TermPageContent() {
       <p style={{ marginBottom: "16px" }}>
         <Link
           href={`/term/${id}/quiz`}
-          style={{ color: "#556b2f", textDecoration: "underline", fontWeight: 500 }}
+          className="link-olive font-medium"
         >
           Quiz Me!
         </Link>
@@ -108,7 +102,7 @@ function TermPageContent() {
       )}
       <Link
         href={getBackLink()}
-        style={{ textDecoration: "underline", color: "#556b2f", cursor: "pointer" }}
+        className="link-olive"
       >
         ← Back to Term List
       </Link>
