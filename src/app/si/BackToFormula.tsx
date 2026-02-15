@@ -14,7 +14,7 @@ export default function BackToFormula() {
     <a
       href="#"
       onClick={handleClick}
-      className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline inline-block"
+      className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline font-semibold inline-block"
     >
       ← Back to Formula
     </a>

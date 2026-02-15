@@ -135,11 +135,7 @@ export default function AdvancedSearch() {
       <div style={{ marginLeft: '20px', marginTop: '20px', marginRight: '20px' }}>
         {/* Navigation */}
         <div style={{ marginBottom: '20px' }}>
-          <Link href="/tables" style={{ 
-            textDecoration: 'underline', 
-            color: '#556b2f', 
-            marginRight: '20px' 
-          }}>
+          <Link href="/tables" className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline font-semibold mr-5">
             ← Back to Tables
           </Link>
           <Link href="/" style={{ 

@@ -244,7 +244,7 @@ export default function SelfTestingPage() {
         <button
           type="button"
           onClick={resetQuiz}
-          className="text-[#6b7c3d] hover:underline mb-4 block"
+          className="text-[#6b7c3d] hover:underline font-semibold mb-4 block"
         >
           ← Back to course selection
         </button>

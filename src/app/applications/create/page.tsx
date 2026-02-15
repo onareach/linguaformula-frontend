@@ -64,10 +64,7 @@ export default function CreateApplication() {
     <div style={{ marginLeft: '20px', marginTop: '20px', marginRight: '20px', maxWidth: '800px' }}>
       {/* Navigation */}
       <div style={{ marginBottom: '20px' }}>
-        <Link href="/applications" style={{ 
-          textDecoration: 'underline', 
-          color: '#556b2f' 
-        }}>
+        <Link href="/applications" className="text-[#6b7c3d] visited:text-[#6b7c3d] hover:underline font-semibold">
           ← Back to Applications
         </Link>
       </div>
